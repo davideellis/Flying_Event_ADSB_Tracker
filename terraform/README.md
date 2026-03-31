@@ -29,3 +29,11 @@ If the infrastructure expands later, add:
 - Keep Terraform changes isolated to this directory
 - Run `terraform fmt` and `terraform validate` as part of infra changes
 - Document required variables and deployment steps here as infra is added
+
+## Current Variables Worth Setting
+
+- `app_secret_key`
+- `bootstrap_admin_password`
+- `domain_name`
+
+When `domain_name` is set and already points at the Lightsail static IP, the bootstrap script will configure nginx for that hostname and request a Let's Encrypt certificate automatically.

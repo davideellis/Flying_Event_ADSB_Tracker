@@ -166,7 +166,9 @@ Current baseline includes:
 - Static IP
 - Public ports for SSH/HTTP/HTTPS
 - Optional SSH key registration
-- Docker bootstrap packages via cloud-init style user data
+- Host-native bootstrap via cloud-init style user data
+- Optional custom domain via `domain_name`
+- Automatic Let's Encrypt issuance when `domain_name` points at the Lightsail IP before bootstrap runs
 
 Before applying Terraform, review bundle size and region to make sure the monthly cost stays within the target budget.
 

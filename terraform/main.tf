@@ -1,7 +1,7 @@
 locals {
   instance_name = var.project_name
   ssh_key_name  = "${var.project_name}-key"
-  public_url    = var.domain_name != "" ? "http://${var.domain_name}" : "http://${aws_lightsail_static_ip.app.ip_address}"
+  public_url    = var.domain_name != "" ? "https://${var.domain_name}" : "http://${aws_lightsail_static_ip.app.ip_address}"
 }
 
 resource "aws_lightsail_key_pair" "this" {
@@ -20,6 +20,7 @@ resource "aws_lightsail_instance" "app" {
   user_data = templatefile("${path.module}/templates/bootstrap.sh.tftpl", {
     repo_url                 = var.repo_url
     repo_branch              = var.repo_branch
+    domain_name              = var.domain_name
     app_secret_key           = var.app_secret_key
     bootstrap_admin_email    = var.bootstrap_admin_email
     bootstrap_admin_password = var.bootstrap_admin_password
@@ -35,6 +36,13 @@ resource "aws_lightsail_instance" "app" {
     Project     = var.project_name
     Environment = "production"
     ManagedBy   = "terraform"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      key_pair_name,
+      user_data,
+    ]
   }
 }
 
@@ -57,14 +65,14 @@ resource "aws_lightsail_instance_public_ports" "app" {
   }
 
   port_info {
-    from_port = 80
-    to_port   = 80
+    from_port = 443
+    to_port   = 443
     protocol  = "tcp"
   }
 
   port_info {
-    from_port = 443
-    to_port   = 443
+    from_port = 80
+    to_port   = 80
     protocol  = "tcp"
   }
 }

@@ -3,7 +3,7 @@ set -eu
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y ca-certificates git nginx python3 python3-pip python3-venv
+apt-get install -y ca-certificates certbot git nginx python3 python3-certbot-nginx python3-pip python3-venv
 
 mkdir -p /opt/feat
 if [ ! -d /opt/feat/.git ]; then
@@ -53,11 +53,11 @@ User=root
 WantedBy=multi-user.target
 EOF
 
-cat > /etc/nginx/sites-available/feat <<'EOF'
+cat > /etc/nginx/sites-available/feat <<EOF
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
+    listen 80;
+    listen [::]:80;
+    server_name ${domain_name != "" ? domain_name : "_"};
 
     location / {
         proxy_pass http://127.0.0.1:8000;
@@ -73,3 +73,16 @@ ln -sf /etc/nginx/sites-available/feat /etc/nginx/sites-enabled/feat
 systemctl daemon-reload
 systemctl enable feat nginx
 systemctl restart feat nginx
+
+if [ -n "${domain_name}" ]; then
+  certbot_args="--nginx --non-interactive --agree-tos -d ${domain_name} --redirect"
+  case "${bootstrap_admin_email}" in
+    *"@example.com"|"" )
+      certbot $certbot_args --register-unsafely-without-email
+      ;;
+    * )
+      certbot $certbot_args --email ${bootstrap_admin_email}
+      ;;
+  esac
+  systemctl restart nginx
+fi
