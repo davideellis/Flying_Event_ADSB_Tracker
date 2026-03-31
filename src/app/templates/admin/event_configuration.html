@@ -7,7 +7,7 @@
     <p>Use this page to set up the event, open or close it, and manage tracked aircraft.</p>
     <form method="post" action="/admin/events/{{ event.id }}/update" class="stack-form">
       <label>Event name <input name="name" value="{{ event.name }}" placeholder="Name shown to admins and public viewers" required></label>
-      <label>URL Name <input name="slug" value="{{ event.slug }}" placeholder="Short URL path like young-eagles-april" required></label>
+      <label>Short Name <input name="slug" value="{{ event.slug }}" placeholder="Short URL path like young-eagles-april" required></label>
       <label>Description <input name="description" value="{{ event.description or '' }}" placeholder="Optional short summary for this event"></label>
       <label>Airport identifier <input name="airport_code" value="{{ event.airport_code or '' }}" placeholder="ICAO/IATA/FAA code like KADS or ADS"></label>
       <label>Airport name <input name="airport_name" value="{{ event.airport_name or '' }}" placeholder="Friendly airport name shown in the app"></label>
