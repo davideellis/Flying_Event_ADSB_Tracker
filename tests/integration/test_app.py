@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy import select
 
 from app.models import Event, EventAircraft, User
+from app.services.adsb import Observation
 
 
 def login(client, email="admin@example.com", password="Password123!"):
@@ -22,11 +25,41 @@ def test_public_event_json_hides_passenger_names(client, session, seeded_event):
     assert "passenger_name" not in response.text
 
 
-def test_public_event_traffic_endpoint_returns_payload(client, seeded_event):
+def test_public_event_traffic_endpoint_returns_payload(client, seeded_event, monkeypatch):
+    class FakeProvider:
+        name = "fake"
+
+        async def fetch_area(self, query):
+            return [
+                Observation(
+                    tail_number="N13579",
+                    latitude=41.99,
+                    longitude=-87.90,
+                    observed_at=datetime.utcnow(),
+                    is_airborne=True,
+                    altitude_ft=2500,
+                    ground_speed_kt=118,
+                    heading_deg=142,
+                    provider="fake",
+                )
+            ]
+
+    monkeypatch.setattr("app.routers.public.get_adsb_provider", lambda: FakeProvider())
     response = client.get(f"/api/public/events/{seeded_event.slug}/traffic")
 
     assert response.status_code == 200
-    assert "traffic" in response.json()
+    payload = response.json()
+    assert "traffic" in payload
+    assert set(payload["traffic"][0].keys()) >= {
+        "tail_number",
+        "latitude",
+        "longitude",
+        "altitude_ft",
+        "ground_speed_kt",
+        "heading_deg",
+        "is_airborne",
+        "observed_at",
+    }
 
 
 def test_admin_can_create_event_after_login(client, session, seeded_admin):

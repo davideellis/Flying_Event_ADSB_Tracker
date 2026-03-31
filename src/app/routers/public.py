@@ -135,6 +135,9 @@ async def public_event_traffic(slug: str, db: Session = Depends(get_db)):
                 "tail_number": observation.tail_number,
                 "latitude": observation.latitude,
                 "longitude": observation.longitude,
+                "altitude_ft": observation.altitude_ft,
+                "ground_speed_kt": observation.ground_speed_kt,
+                "heading_deg": observation.heading_deg,
                 "is_airborne": observation.is_airborne,
                 "observed_at": observation.observed_at.isoformat(),
             }
