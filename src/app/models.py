@@ -90,6 +90,7 @@ class Event(Base):
     arrival_hold_seconds: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    show_passenger_name_public: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     starts_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_by_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True)

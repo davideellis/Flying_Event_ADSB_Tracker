@@ -4,7 +4,7 @@
   <div>
     <p class="eyebrow">Event View</p>
     <h1>{{ event.name }}</h1>
-    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }}  -  States are public, passenger names stay private.</p>
+    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }}  -  States are public, passenger names are {{ 'public' if event.show_passenger_name_public else 'private' }}.</p>
   </div>
   <div class="event-stats">
     <span>Airport center: {{ event.latitude }}, {{ event.longitude }}</span>
@@ -12,23 +12,35 @@
   </div>
 </section>
 <section class="map-layout">
-  <div class="map-card">
+  <div class="map-card panel-fullscreen" id="map-card">
     <div class="map-controls">
       <label><input type="checkbox" id="show-all-aircraft"> Show all aircraft in area</label>
+      <button class="button subtle" id="toggle-map-fullscreen" type="button">Full screen map</button>
     </div>
     <div id="map" class="map-panel"></div>
   </div>
-  <aside class="sidebar">
-    <h2>Tracked Aircraft</h2>
-    {% for aircraft in event.aircraft %}
-    <article class="aircraft-row">
-      <strong>{{ aircraft.tail_number }}</strong>
-      <span>{{ aircraft.effective_state.value }}</span>
-      <small>Last seen: {{ aircraft.last_seen_at or 'Not yet observed' }}</small>
-    </article>
-    {% else %}
-    <p>No aircraft configured.</p>
-    {% endfor %}
+  <aside class="sidebar panel-fullscreen" id="tracked-aircraft-card">
+    <div class="sidebar-header">
+      <h2>Tracked Aircraft</h2>
+      <button class="button subtle" id="toggle-aircraft-fullscreen" type="button">Full screen aircraft</button>
+    </div>
+    <div class="aircraft-board-wrap">
+      <table class="aircraft-board" id="tracked-aircraft-table">
+        <thead>
+          <tr id="tracked-aircraft-header-row">
+            <th>Tail</th>
+            <th>State</th>
+            <th>Speed</th>
+            <th>Altitude</th>
+          </tr>
+        </thead>
+        <tbody id="tracked-aircraft-body">
+          <tr>
+            <td colspan="4">Loading tracked aircraft...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </aside>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

@@ -17,6 +17,7 @@ async function loadEvent() {
   const eventPayload = await eventResponse.json();
   const trafficPayload = trafficResponse.ok ? await trafficResponse.json() : { traffic: [] };
   renderMap(eventPayload, trafficPayload.traffic || []);
+  renderTrackedAircraftBoard(eventPayload);
 }
 
 function renderMap(payload, traffic) {
@@ -39,6 +40,50 @@ function renderMap(payload, traffic) {
       .filter((aircraft) => !trackedTailNumbers.has(aircraft.tail_number))
       .forEach((aircraft) => renderAreaTrafficAircraft(aircraft));
   }
+}
+
+function renderTrackedAircraftBoard(payload) {
+  const headerRow = document.getElementById('tracked-aircraft-header-row');
+  const tableBody = document.getElementById('tracked-aircraft-body');
+  if (!headerRow || !tableBody) {
+    return;
+  }
+
+  const showPassenger = Boolean(payload.event.show_passenger_name_public);
+  headerRow.innerHTML = `
+    <th>Tail</th>
+    <th>State</th>
+    <th>Speed</th>
+    <th>Altitude</th>
+    ${showPassenger ? '<th>Passenger</th>' : ''}
+  `;
+
+  if (!payload.aircraft.length) {
+    tableBody.innerHTML = `<tr><td colspan="${showPassenger ? 5 : 4}">No aircraft configured.</td></tr>`;
+    return;
+  }
+
+  const rows = payload.aircraft
+    .slice()
+    .sort((left, right) => left.tail_number.localeCompare(right.tail_number))
+    .map((aircraft) => {
+      const lastSeen = aircraft.last_seen || {};
+      const passengerCell = showPassenger
+        ? `<td>${aircraft.current_passenger_name || ''}</td>`
+        : '';
+      return `
+        <tr>
+          <td><strong>${escapeHtml(aircraft.tail_number)}</strong></td>
+          <td>${escapeHtml(aircraft.state)}</td>
+          <td>${formatSpeed(lastSeen.ground_speed_kt)}</td>
+          <td>${formatAltitude(lastSeen.altitude_ft)}</td>
+          ${passengerCell}
+        </tr>
+      `;
+    })
+    .join('');
+
+  tableBody.innerHTML = rows;
 }
 
 function clearLayers() {
@@ -84,10 +129,11 @@ function renderTrackedAircraft(aircraft) {
       }
     ).addTo(map);
     marker.bindPopup(`
-      <strong>${aircraft.tail_number}</strong><br>
-      ${aircraft.state}<br>
+      <strong>${escapeHtml(aircraft.tail_number)}</strong><br>
+      ${escapeHtml(aircraft.state)}<br>
       Speed: ${formatSpeed(lastSeen.ground_speed_kt)}<br>
       Alt: ${formatAltitude(lastSeen.altitude_ft)}
+      ${aircraft.current_passenger_name ? `<br>Passenger: ${escapeHtml(aircraft.current_passenger_name)}` : ''}
     `);
     bindLabel(marker, buildAircraftLabel(aircraft.tail_number, lastSeen.ground_speed_kt, lastSeen.altitude_ft), 'tracked-label');
     trackedMarkers.push(marker);
@@ -135,7 +181,7 @@ function renderAreaTrafficAircraft(aircraft) {
     }
   ).addTo(map);
   marker.bindPopup(`
-    <strong>${aircraft.tail_number}</strong><br>
+    <strong>${escapeHtml(aircraft.tail_number)}</strong><br>
     Area traffic<br>
     Speed: ${formatSpeed(aircraft.ground_speed_kt)}<br>
     Alt: ${formatAltitude(aircraft.altitude_ft)}
@@ -227,6 +273,42 @@ function bindLabel(marker, text, className, offset = [0, -16]) {
   });
 }
 
+function bindFullscreenToggle(buttonId, panelId, activeClass) {
+  const button = document.getElementById(buttonId);
+  const panel = document.getElementById(panelId);
+  if (!button || !panel) {
+    return;
+  }
+
+  button.addEventListener('click', () => {
+    const panels = Array.from(document.querySelectorAll('.panel-fullscreen'));
+    const isActive = panel.classList.contains(activeClass);
+    panels.forEach((item) => item.classList.remove('panel-fullscreen-active'));
+    document.getElementById('map-card')?.classList.remove('panel-fullscreen-active');
+    document.getElementById('tracked-aircraft-card')?.classList.remove('panel-fullscreen-active');
+    if (!isActive) {
+      panel.classList.add('panel-fullscreen-active');
+    }
+    updateFullscreenButtons();
+    if (panelId === 'map-card') {
+      window.setTimeout(() => map?.invalidateSize(), 120);
+    }
+  });
+}
+
+function updateFullscreenButtons() {
+  const mapButton = document.getElementById('toggle-map-fullscreen');
+  const aircraftButton = document.getElementById('toggle-aircraft-fullscreen');
+  const mapActive = document.getElementById('map-card')?.classList.contains('panel-fullscreen-active');
+  const aircraftActive = document.getElementById('tracked-aircraft-card')?.classList.contains('panel-fullscreen-active');
+  if (mapButton) {
+    mapButton.textContent = mapActive ? 'Exit full screen' : 'Full screen map';
+  }
+  if (aircraftButton) {
+    aircraftButton.textContent = aircraftActive ? 'Exit full screen' : 'Full screen aircraft';
+  }
+}
+
 function buildAircraftLabel(tailNumber, speed, altitude) {
   return `${tailNumber} ${formatSpeed(speed)} ${formatAltitude(altitude)}`;
 }
@@ -239,8 +321,19 @@ function formatAltitude(altitude) {
   return altitude == null ? '--ft' : `${Math.round(altitude)}ft`;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 if (document.getElementById('map')) {
   document.getElementById('show-all-aircraft')?.addEventListener('change', loadEvent);
+  bindFullscreenToggle('toggle-map-fullscreen', 'map-card', 'panel-fullscreen-active');
+  bindFullscreenToggle('toggle-aircraft-fullscreen', 'tracked-aircraft-card', 'panel-fullscreen-active');
   loadEvent();
   setInterval(loadEvent, 10000);
 }

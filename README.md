@@ -35,10 +35,11 @@ This stack keeps deployment simple on one VM while still giving us a clean path 
 - Published event list
 - Direct event page by slug
 - Public aircraft states
-- Map with current and archived tracks
+- Map with current and archived tracks plus a highlighted event-airport marker
 - JSON endpoint for tracked event polling
 - Area-traffic JSON endpoint for the public map toggle
-- Passenger names hidden from public responses
+- Full-screen map and tracked-aircraft views on the public event page
+- Passenger names hidden from public responses unless the event is explicitly configured to show them
 
 ### Admin
 - Email/password login
@@ -48,6 +49,7 @@ This stack keeps deployment simple on one VM while still giving us a clean path 
 - Admin dashboard organized with events first and a dedicated user administration section
 - Create, edit, and delete events
 - Create and update events from an airport identifier with automatic airport coordinate lookup
+- Configure whether current passenger names are shown on the public event page
 - Add and delete tracked aircraft
 - Manually set aircraft state
 - Queue, activate, and cancel passengers

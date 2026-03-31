@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from app.models import Event, EventAircraft, User
+from app.models import Event, EventAircraft, PassengerAssignment, PassengerAssignmentStatus, User
 from app.services.adsb import Observation
 from app.services.auth import verify_password
 
@@ -23,7 +23,28 @@ def test_public_event_json_hides_passenger_names(client, session, seeded_event):
     assert response.status_code == 200
     payload = response.json()
     assert payload["event"]["slug"] == seeded_event.slug
-    assert "passenger_name" not in response.text
+    assert "current_passenger_name" not in response.text
+
+
+def test_public_event_json_can_show_current_passenger_name_when_enabled(client, session, seeded_event):
+    aircraft = session.scalar(select(EventAircraft).where(EventAircraft.event_id == seeded_event.id))
+    assignment = PassengerAssignment(
+        event_aircraft_id=aircraft.id,
+        passenger_name="Aviator Kid",
+        queue_position=1,
+        status=PassengerAssignmentStatus.CURRENT,
+    )
+    aircraft.current_passenger_assignment = assignment
+    seeded_event.show_passenger_name_public = True
+    session.add(assignment)
+    session.commit()
+
+    response = client.get(f"/api/public/events/{seeded_event.slug}")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["event"]["show_passenger_name_public"] is True
+    assert payload["aircraft"][0]["current_passenger_name"] == "Aviator Kid"
 
 
 def test_public_event_traffic_endpoint_returns_payload(client, seeded_event, monkeypatch):
@@ -144,6 +165,7 @@ def test_admin_can_update_event_after_login(client, session, seeded_admin, seede
             "arrival_hold_seconds": seeded_event.arrival_hold_seconds,
             "is_published": "true",
             "is_active": "true",
+            "show_passenger_name_public": "true",
         },
         follow_redirects=False,
     )
@@ -151,6 +173,7 @@ def test_admin_can_update_event_after_login(client, session, seeded_admin, seede
     assert response.status_code == 303
     session.refresh(seeded_event)
     assert seeded_event.name == "Updated Event"
+    assert seeded_event.show_passenger_name_public is True
 
 
 def test_admin_can_update_event_from_airport_identifier(client, session, seeded_admin, seeded_event):

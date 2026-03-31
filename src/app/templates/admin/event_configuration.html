@@ -21,6 +21,7 @@
       <label>Arrival hold seconds <input name="arrival_hold_seconds" type="number" value="{{ event.arrival_hold_seconds }}" required></label>
       <label><input name="is_published" type="checkbox" value="true" {% if event.is_published %}checked{% endif %}> Published</label>
       <label><input name="is_active" type="checkbox" value="true" {% if event.is_active %}checked{% endif %}> Active</label>
+      <label><input name="show_passenger_name_public" type="checkbox" value="true" {% if event.show_passenger_name_public %}checked{% endif %}> Show passenger name publicly</label>
       <button class="button" type="submit">Save event</button>
     </form>
     <form method="post" action="/admin/events/{{ event.id }}/delete">

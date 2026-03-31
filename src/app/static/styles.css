@@ -122,7 +122,56 @@ h1, h2, h3, p { margin-top: 0; }
   grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr);
   gap: 1rem;
 }
+.map-controls, .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  align-items: center;
+  margin-bottom: .85rem;
+}
+.sidebar-header h2 {
+  margin-bottom: 0;
+}
 .map-panel { min-height: 520px; border-radius: 16px; overflow: hidden; }
+.panel-fullscreen-active {
+  position: fixed;
+  inset: 1rem;
+  z-index: 1100;
+  margin: 0;
+  width: auto;
+  height: auto;
+  overflow: auto;
+}
+.panel-fullscreen-active .map-panel {
+  min-height: calc(100vh - 11rem);
+}
+.panel-fullscreen-active .aircraft-board-wrap {
+  max-height: calc(100vh - 10rem);
+}
+.aircraft-board-wrap {
+  overflow: auto;
+}
+.aircraft-board {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.aircraft-board th,
+.aircraft-board td {
+  border: 1px solid var(--line);
+  padding: .45rem .55rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.aircraft-board th {
+  background: #f3eee3;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.aircraft-board tbody tr:nth-child(even) {
+  background: #faf7f0;
+}
 .aircraft-div-icon {
   background: transparent;
   border: 0;
@@ -197,11 +246,6 @@ h1, h2, h3, p { margin-top: 0; }
   background: rgba(201, 59, 50, 0.92);
 }
 .sidebar, .aircraft-row { display: grid; gap: .35rem; }
-.aircraft-row {
-  border-bottom: 1px solid var(--line);
-  padding: .75rem 0;
-}
-.aircraft-row:last-child { border-bottom: none; }
 .aircraft-admin-card { margin-bottom: 1rem; }
 .user-admin-card {
   display: grid;

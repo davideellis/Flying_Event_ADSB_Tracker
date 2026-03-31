@@ -69,6 +69,14 @@ def public_event_json(slug: str, db: Session = Depends(get_db)):
         archived_tracks = [
             track for track in aircraft.tracks if track.status == TrackStatus.ARCHIVED
         ]
+        current_passenger_name = next(
+            (
+                assignment.passenger_name
+                for assignment in aircraft.passenger_assignments
+                if assignment.status == PassengerAssignmentStatus.CURRENT
+            ),
+            None,
+        )
         aircraft_payload.append(
             {
                 "id": aircraft.id,
@@ -93,6 +101,11 @@ def public_event_json(slug: str, db: Session = Depends(get_db)):
                     assignment.status == PassengerAssignmentStatus.CURRENT
                     for assignment in aircraft.passenger_assignments
                 ),
+                **(
+                    {"current_passenger_name": current_passenger_name}
+                    if event.show_passenger_name_public and current_passenger_name
+                    else {}
+                ),
             }
         )
     return JSONResponse(
@@ -109,6 +122,7 @@ def public_event_json(slug: str, db: Session = Depends(get_db)):
                 "map_center_longitude": float(event.map_center_longitude),
                 "default_zoom": event.default_zoom,
                 "event_radius_nm": float(event.event_radius_nm),
+                "show_passenger_name_public": event.show_passenger_name_public,
             },
             "aircraft": aircraft_payload,
         }

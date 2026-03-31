@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select
+from sqlalchemy import inspect, select, text
 
 from app.config import get_settings
 from app.db import Base, SessionLocal, engine
@@ -18,6 +18,21 @@ from app.services.worker import poller_loop
 
 def initialize_database() -> None:
     Base.metadata.create_all(bind=engine)
+    _ensure_runtime_schema()
+
+
+def _ensure_runtime_schema() -> None:
+    inspector = inspect(engine)
+    if "events" not in inspector.get_table_names():
+        return
+    event_columns = {column["name"] for column in inspector.get_columns("events")}
+    if "show_passenger_name_public" not in event_columns:
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    "ALTER TABLE events ADD COLUMN show_passenger_name_public BOOLEAN NOT NULL DEFAULT 0"
+                )
+            )
 
 
 def bootstrap_admin() -> None:

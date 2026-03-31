@@ -181,6 +181,7 @@ def create_event(
     arrival_hold_seconds: int = Form(...),
     is_published: bool = Form(False),
     is_active: bool = Form(False),
+    show_passenger_name_public: bool = Form(False),
     description: str = Form(""),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -217,6 +218,7 @@ def create_event(
         arrival_hold_seconds=arrival_hold_seconds,
         is_published=is_published,
         is_active=is_active,
+        show_passenger_name_public=show_passenger_name_public,
         created_by_user_id=user.id,
     )
     db.add(event)
@@ -298,6 +300,7 @@ def update_event(
     arrival_hold_seconds: int = Form(...),
     is_published: bool = Form(False),
     is_active: bool = Form(False),
+    show_passenger_name_public: bool = Form(False),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
@@ -336,6 +339,7 @@ def update_event(
     event.arrival_hold_seconds = arrival_hold_seconds
     event.is_published = is_published
     event.is_active = is_active
+    event.show_passenger_name_public = show_passenger_name_public
     db.commit()
     return RedirectResponse(url=f"/admin/events/{event.id}/configuration", status_code=303)
 
