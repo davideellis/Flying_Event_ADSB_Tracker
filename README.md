@@ -45,6 +45,7 @@ This stack keeps deployment simple on one VM while still giving us a clean path 
 - Password reset token flow for local/dev use
 - Bootstrap admin user on first startup
 - Create, edit, and delete events
+- Create and update events from an airport identifier with automatic airport coordinate lookup
 - Add and delete tracked aircraft
 - Manually set aircraft state
 - Queue, activate, and cancel passengers

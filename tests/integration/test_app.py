@@ -56,6 +56,39 @@ def test_admin_can_create_event_after_login(client, session, seeded_admin):
     assert any(event.slug == "challenge-air-demo" for event in session.query(Event).all())
 
 
+def test_admin_can_create_event_from_airport_identifier(client, session, seeded_admin):
+    login_response = login(client)
+    assert login_response.status_code == 303
+
+    response = client.post(
+        "/admin/events",
+        data={
+            "name": "Addison Identifier Demo",
+            "slug": "addison-identifier-demo",
+            "airport_code": "KADS",
+            "airport_name": "",
+            "latitude": "",
+            "longitude": "",
+            "default_zoom": 11,
+            "event_radius_nm": 12,
+            "return_radius_nm": 2,
+            "arrival_hold_seconds": 90,
+            "is_published": "true",
+            "is_active": "true",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    event = session.scalar(select(Event).where(Event.slug == "addison-identifier-demo"))
+    assert event is not None
+    assert event.airport_name == "Addison Airport"
+    assert float(event.latitude) == 32.968556
+    assert float(event.longitude) == -96.836444
+    assert float(event.map_center_latitude) == 32.968556
+    assert float(event.map_center_longitude) == -96.836444
+
+
 def test_admin_can_update_event_after_login(client, session, seeded_admin, seeded_event):
     login(client)
 
@@ -84,6 +117,39 @@ def test_admin_can_update_event_after_login(client, session, seeded_admin, seede
     assert response.status_code == 303
     session.refresh(seeded_event)
     assert seeded_event.name == "Updated Event"
+
+
+def test_admin_can_update_event_from_airport_identifier(client, session, seeded_admin, seeded_event):
+    login(client)
+
+    response = client.post(
+        f"/admin/events/{seeded_event.id}/update",
+        data={
+            "name": "Identifier Update Event",
+            "slug": seeded_event.slug,
+            "description": seeded_event.description or "",
+            "airport_code": "KADS",
+            "airport_name": "",
+            "latitude": "",
+            "longitude": "",
+            "map_center_latitude": "",
+            "map_center_longitude": "",
+            "default_zoom": seeded_event.default_zoom,
+            "event_radius_nm": seeded_event.event_radius_nm,
+            "return_radius_nm": seeded_event.return_radius_nm,
+            "arrival_hold_seconds": seeded_event.arrival_hold_seconds,
+            "is_published": "true",
+            "is_active": "true",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    session.refresh(seeded_event)
+    assert seeded_event.airport_code == "KADS"
+    assert seeded_event.airport_name == "Addison Airport"
+    assert float(seeded_event.latitude) == 32.968556
+    assert float(seeded_event.longitude) == -96.836444
 
 
 def test_admin_can_queue_and_activate_passenger(client, session, seeded_admin, seeded_event):

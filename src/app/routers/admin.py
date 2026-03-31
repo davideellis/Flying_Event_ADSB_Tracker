@@ -19,6 +19,7 @@ from app.models import (
     User,
 )
 from app.services.adsb import Observation
+from app.services.airports import lookup_airport
 from app.services.auth import create_user
 from app.services.domain import (
     QueueLimitExceededError,
@@ -36,6 +37,64 @@ def _event_query() -> select:
     return select(Event).options(
         selectinload(Event.aircraft).selectinload(EventAircraft.passenger_assignments),
         selectinload(Event.aircraft).selectinload(EventAircraft.tracks),
+    )
+
+
+def _parse_optional_float(raw_value: str) -> float | None:
+    value = raw_value.strip()
+    if not value:
+        return None
+    return float(value)
+
+
+def _resolve_event_location(
+    airport_code: str,
+    airport_name: str,
+    latitude: str,
+    longitude: str,
+    map_center_latitude: str,
+    map_center_longitude: str,
+) -> tuple[str | None, str | None, float, float, float, float]:
+    resolved_airport_code = airport_code.strip().upper() or None
+    resolved_airport_name = airport_name.strip() or None
+
+    lat_value = _parse_optional_float(latitude)
+    lon_value = _parse_optional_float(longitude)
+    center_lat_value = _parse_optional_float(map_center_latitude)
+    center_lon_value = _parse_optional_float(map_center_longitude)
+
+    airport = lookup_airport(resolved_airport_code or "") if resolved_airport_code else None
+    if airport:
+        resolved_airport_code = resolved_airport_code or airport.resolved_code
+        if lat_value is None:
+            lat_value = airport.latitude
+        if lon_value is None:
+            lon_value = airport.longitude
+        if center_lat_value is None:
+            center_lat_value = lat_value
+        if center_lon_value is None:
+            center_lon_value = lon_value
+        if not resolved_airport_name:
+            resolved_airport_name = airport.name
+
+    if lat_value is None or lon_value is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Latitude and longitude are required unless a valid airport identifier is provided.",
+        )
+
+    if center_lat_value is None:
+        center_lat_value = lat_value
+    if center_lon_value is None:
+        center_lon_value = lon_value
+
+    return (
+        resolved_airport_code,
+        resolved_airport_name,
+        lat_value,
+        lon_value,
+        center_lat_value,
+        center_lon_value,
     )
 
 
@@ -88,8 +147,8 @@ def create_event(
     slug: str = Form(...),
     airport_code: str = Form(""),
     airport_name: str = Form(""),
-    latitude: float = Form(...),
-    longitude: float = Form(...),
+    latitude: str = Form(""),
+    longitude: str = Form(""),
     default_zoom: int = Form(11),
     event_radius_nm: float = Form(...),
     return_radius_nm: float = Form(...),
@@ -100,16 +159,32 @@ def create_event(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
+    (
+        resolved_airport_code,
+        resolved_airport_name,
+        resolved_latitude,
+        resolved_longitude,
+        resolved_map_center_latitude,
+        resolved_map_center_longitude,
+    ) = _resolve_event_location(
+        airport_code,
+        airport_name,
+        latitude,
+        longitude,
+        "",
+        "",
+    )
+
     event = Event(
         name=name,
         slug=slug,
         description=description or None,
-        airport_code=airport_code or None,
-        airport_name=airport_name or None,
-        latitude=latitude,
-        longitude=longitude,
-        map_center_latitude=latitude,
-        map_center_longitude=longitude,
+        airport_code=resolved_airport_code,
+        airport_name=resolved_airport_name,
+        latitude=resolved_latitude,
+        longitude=resolved_longitude,
+        map_center_latitude=resolved_map_center_latitude,
+        map_center_longitude=resolved_map_center_longitude,
         default_zoom=default_zoom,
         event_radius_nm=event_radius_nm,
         return_radius_nm=return_radius_nm,
@@ -148,10 +223,10 @@ def update_event(
     description: str = Form(""),
     airport_code: str = Form(""),
     airport_name: str = Form(""),
-    latitude: float = Form(...),
-    longitude: float = Form(...),
-    map_center_latitude: float = Form(...),
-    map_center_longitude: float = Form(...),
+    latitude: str = Form(""),
+    longitude: str = Form(""),
+    map_center_latitude: str = Form(""),
+    map_center_longitude: str = Form(""),
     default_zoom: int = Form(...),
     event_radius_nm: float = Form(...),
     return_radius_nm: float = Form(...),
@@ -164,15 +239,32 @@ def update_event(
     event = db.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=404)
+
+    (
+        resolved_airport_code,
+        resolved_airport_name,
+        resolved_latitude,
+        resolved_longitude,
+        resolved_map_center_latitude,
+        resolved_map_center_longitude,
+    ) = _resolve_event_location(
+        airport_code,
+        airport_name,
+        latitude,
+        longitude,
+        map_center_latitude,
+        map_center_longitude,
+    )
+
     event.name = name
     event.slug = slug
     event.description = description or None
-    event.airport_code = airport_code or None
-    event.airport_name = airport_name or None
-    event.latitude = latitude
-    event.longitude = longitude
-    event.map_center_latitude = map_center_latitude
-    event.map_center_longitude = map_center_longitude
+    event.airport_code = resolved_airport_code
+    event.airport_name = resolved_airport_name
+    event.latitude = resolved_latitude
+    event.longitude = resolved_longitude
+    event.map_center_latitude = resolved_map_center_latitude
+    event.map_center_longitude = resolved_map_center_longitude
     event.default_zoom = default_zoom
     event.event_radius_nm = event_radius_nm
     event.return_radius_nm = return_radius_nm
