@@ -13,7 +13,7 @@
     <h2>Edit Event</h2>
     <form method="post" action="/admin/events/{{ event.id }}/update" class="stack-form">
       <label>Name <input name="name" value="{{ event.name }}" required></label>
-      <label>Slug <input name="slug" value="{{ event.slug }}" required></label>
+      <label>URL Name <input name="slug" value="{{ event.slug }}" required></label>
       <label>Description <input name="description" value="{{ event.description or '' }}"></label>
       <label>Airport code <input name="airport_code" value="{{ event.airport_code or '' }}"></label>
       <label>Airport name <input name="airport_name" value="{{ event.airport_name or '' }}"></label>
