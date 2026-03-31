@@ -216,6 +216,29 @@ h1, h2, h3, p { margin-top: 0; }
 .aircraft-board tbody tr:nth-child(even) {
   background: var(--row-bg);
 }
+.aircraft-config-table td {
+  vertical-align: middle;
+}
+.aircraft-config-table .table-input {
+  width: 100%;
+  min-width: 0;
+  padding: .6rem .75rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--ink);
+  font: inherit;
+}
+.aircraft-config-table .table-input::placeholder {
+  color: var(--muted);
+}
+.aircraft-config-table form {
+  margin: 0;
+}
+.aircraft-config-table .button {
+  width: 100%;
+  text-align: center;
+}
 .aircraft-div-icon {
   background: transparent;
   border: 0;

@@ -49,10 +49,10 @@
       {% for aircraft in event.aircraft %}
           <tr>
             <td>
-              <input form="aircraft-update-{{ aircraft.id }}" name="tail_number" value="{{ aircraft.tail_number }}" required>
+              <input class="table-input" form="aircraft-update-{{ aircraft.id }}" name="tail_number" value="{{ aircraft.tail_number }}" required>
             </td>
             <td>
-              <input form="aircraft-update-{{ aircraft.id }}" name="display_name" value="{{ aircraft.display_name or '' }}">
+              <input class="table-input" form="aircraft-update-{{ aircraft.id }}" name="display_name" value="{{ aircraft.display_name or '' }}">
             </td>
             <td>
               <form id="aircraft-update-{{ aircraft.id }}" method="post" action="/admin/aircraft/{{ aircraft.id }}/update" class="aircraft-config-row-form">

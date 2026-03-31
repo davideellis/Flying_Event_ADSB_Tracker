@@ -29,6 +29,36 @@ The repo now includes a broader working stack:
 
 This stack keeps deployment simple on one VM while still giving us a clean path to split the worker, move to managed Postgres, or swap ADS-B providers later.
 
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+    Spectator[Public Spectator Browser]
+    Admin[Admin Browser]
+    Nginx[nginx on Lightsail]
+    App[FastAPI App<br/>Jinja + JSON APIs]
+    Worker[Background Poller]
+    Provider[ADSB Provider Adapter]
+    PublicSource[Public / Community ADS-B Source]
+    DB[(SQLite now<br/>Postgres target)]
+    Map[Leaflet + OpenStreetMap]
+
+    Spectator -->|HTTPS| Nginx
+    Admin -->|HTTPS| Nginx
+    Nginx --> App
+
+    App --> DB
+    Worker --> DB
+    Worker --> Provider
+    Provider --> PublicSource
+
+    App -->|event JSON + traffic JSON| Map
+    Map --> Spectator
+    App -->|admin workflows| Admin
+```
+
+Current production is a single Lightsail VM with `nginx`, the FastAPI app, the in-process worker, and a local SQLite database. The codebase is already structured so we can move to host-managed Postgres and a separate worker later without rewriting the app surface area.
+
 ## Current Features
 
 ### Public
