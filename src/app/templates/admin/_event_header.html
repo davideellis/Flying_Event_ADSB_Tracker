@@ -1,0 +1,16 @@
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Event Admin</p>
+    <h1>{{ event.name }}</h1>
+    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }}  -  {{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</p>
+  </div>
+  <div class="stack-actions">
+    <a class="button subtle" href="/admin">Back to dashboard</a>
+    <a class="button subtle" href="/public/events/{{ event.slug }}">Public event view</a>
+  </div>
+</section>
+<nav class="tab-strip">
+  <a class="tab-link {% if active_tab == 'operations' %}active{% endif %}" href="{{ operations_url }}">Live Aircraft</a>
+  <a class="tab-link {% if active_tab == 'configuration' %}active{% endif %}" href="{{ configuration_url }}">Event Configuration</a>
+  <a class="tab-link {% if active_tab == 'diagnostics' %}active{% endif %}" href="{{ diagnostics_url }}">Diagnostics</a>
+</nav>

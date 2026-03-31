@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_event_header.html" %}
+<section class="card admin-panel">
+  <h2>Live Aircraft Management</h2>
+  <p>Use this page during the event for dispatching, passenger queueing, and state changes.</p>
+  {% for aircraft in event.aircraft %}
+  <article class="aircraft-admin-card">
+    <div class="aircraft-admin-header">
+      <div>
+        <h3>{{ aircraft.tail_number }}</h3>
+        <p>{{ aircraft.display_name or 'No display name' }}  -  Effective state: {{ aircraft.effective_state.value }}</p>
+      </div>
+      <div class="stack-actions">
+        <small>Last seen: {{ aircraft.last_seen_at or 'Not yet observed' }}</small>
+        {% if aircraft.current_passenger_assignment %}
+        <small>Current passenger: {{ aircraft.current_passenger_assignment.passenger_name }}</small>
+        {% endif %}
+      </div>
+    </div>
+    <div class="three-up">
+      <form method="post" action="/admin/aircraft/{{ aircraft.id }}/state" class="stack-form inline-form">
+        <label>Manual state
+          <select name="state">
+            <option {% if aircraft.effective_state.value == 'Idle' %}selected{% endif %}>Idle</option>
+            <option {% if aircraft.effective_state.value == 'Boarding' %}selected{% endif %}>Boarding</option>
+            <option {% if aircraft.effective_state.value == 'Taxiing' %}selected{% endif %}>Taxiing</option>
+            <option {% if aircraft.effective_state.value == 'Flying' %}selected{% endif %}>Flying</option>
+            <option {% if aircraft.effective_state.value == 'Arrived' %}selected{% endif %}>Arrived</option>
+          </select>
+        </label>
+        <button class="button subtle" type="submit">Update state</button>
+      </form>
+      <form method="post" action="/admin/aircraft/{{ aircraft.id }}/passengers" class="stack-form inline-form">
+        <label>Add passenger <input name="passenger_name" required></label>
+        <button class="button" type="submit">Queue passenger</button>
+      </form>
+    </div>
+    <div class="queue-list">
+      {% for assignment in aircraft.passenger_assignments|sort(attribute='queue_position') %}
+      <div class="table-row">
+        <div>
+          <strong>{{ assignment.passenger_name }}</strong>
+          <span>{{ assignment.status.value }}  -  position {{ assignment.queue_position }}</span>
+        </div>
+        <div class="row-actions">
+          {% if assignment.status.value != 'current' and assignment.status.value != 'cancelled' %}
+          <form method="post" action="/admin/aircraft/{{ aircraft.id }}/passengers/{{ assignment.id }}/activate">
+            <button class="button subtle" type="submit">Activate</button>
+          </form>
+          <form method="post" action="/admin/aircraft/{{ aircraft.id }}/passengers/{{ assignment.id }}/cancel">
+            <button class="button subtle danger" type="submit">Cancel</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <p>No passengers queued yet.</p>
+      {% endfor %}
+    </div>
+  </article>
+  {% else %}
+  <p>No aircraft configured yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

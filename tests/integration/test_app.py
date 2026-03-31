@@ -185,6 +185,21 @@ def test_admin_can_update_event_from_airport_identifier(client, session, seeded_
     assert float(seeded_event.longitude) == -96.836444
 
 
+def test_event_admin_pages_are_split_by_workflow(client, seeded_admin, seeded_event):
+    login(client)
+
+    operations = client.get(f"/admin/events/{seeded_event.id}/operations")
+    configuration = client.get(f"/admin/events/{seeded_event.id}/configuration")
+    diagnostics = client.get(f"/admin/events/{seeded_event.id}/diagnostics")
+
+    assert operations.status_code == 200
+    assert configuration.status_code == 200
+    assert diagnostics.status_code == 200
+    assert "Live Aircraft Management" in operations.text
+    assert "Event Configuration" in configuration.text
+    assert "Simulation" in diagnostics.text
+
+
 def test_admin_can_queue_and_activate_passenger(client, session, seeded_admin, seeded_event):
     aircraft = session.scalar(select(EventAircraft).where(EventAircraft.event_id == seeded_event.id))
     login(client)

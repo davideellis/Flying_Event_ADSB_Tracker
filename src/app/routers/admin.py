@@ -40,6 +40,17 @@ def _event_query() -> select:
     )
 
 
+def _event_detail_context(user: User, event: Event, active_tab: str) -> dict:
+    return {
+        "user": user,
+        "event": event,
+        "active_tab": active_tab,
+        "operations_url": f"/admin/events/{event.id}/operations",
+        "configuration_url": f"/admin/events/{event.id}/configuration",
+        "diagnostics_url": f"/admin/events/{event.id}/diagnostics",
+    }
+
+
 def _parse_optional_float(raw_value: str) -> float | None:
     value = raw_value.strip()
     if not value:
@@ -195,11 +206,16 @@ def create_event(
     )
     db.add(event)
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{event.id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{event.id}/configuration", status_code=303)
 
 
 @router.get("/events/{event_id}", response_class=HTMLResponse)
-def event_detail(
+def event_detail(event_id: str):
+    return RedirectResponse(url=f"/admin/events/{event_id}/operations", status_code=303)
+
+
+@router.get("/events/{event_id}/operations", response_class=HTMLResponse)
+def event_operations(
     event_id: str,
     request: Request,
     db: Session = Depends(get_db),
@@ -210,8 +226,42 @@ def event_detail(
         raise HTTPException(status_code=404)
     return templates.TemplateResponse(
         request,
-        "admin/event_detail.html",
-        {"user": user, "event": event, "error": None},
+        "admin/event_operations.html",
+        _event_detail_context(user, event, "operations"),
+    )
+
+
+@router.get("/events/{event_id}/configuration", response_class=HTMLResponse)
+def event_configuration(
+    event_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    event = db.scalar(_event_query().where(Event.id == event_id))
+    if not event:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(
+        request,
+        "admin/event_configuration.html",
+        _event_detail_context(user, event, "configuration"),
+    )
+
+
+@router.get("/events/{event_id}/diagnostics", response_class=HTMLResponse)
+def event_diagnostics(
+    event_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    event = db.scalar(_event_query().where(Event.id == event_id))
+    if not event:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(
+        request,
+        "admin/event_diagnostics.html",
+        _event_detail_context(user, event, "diagnostics"),
     )
 
 
@@ -272,7 +322,7 @@ def update_event(
     event.is_published = is_published
     event.is_active = is_active
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{event.id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{event.id}/configuration", status_code=303)
 
 
 @router.post("/events/{event_id}/delete")
@@ -304,7 +354,7 @@ def add_aircraft(
     )
     db.add(aircraft)
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{event_id}/configuration", status_code=303)
 
 
 @router.post("/aircraft/{aircraft_id}/delete")
@@ -319,7 +369,7 @@ def delete_aircraft(
     event_id = aircraft.event_id
     db.delete(aircraft)
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{event_id}/configuration", status_code=303)
 
 
 @router.post("/aircraft/{aircraft_id}/state")
@@ -341,7 +391,7 @@ def update_aircraft_state(
         changed_by_user_id=user.id,
     )
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}/operations", status_code=303)
 
 
 @router.post("/aircraft/{aircraft_id}/passengers")
@@ -366,7 +416,7 @@ def add_passenger(
         db.commit()
     except QueueLimitExceededError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}/operations", status_code=303)
 
 
 @router.post("/aircraft/{aircraft_id}/passengers/{assignment_id}/activate")
@@ -391,7 +441,7 @@ def activate_aircraft_passenger(
         raise HTTPException(status_code=404)
     activate_passenger(db, aircraft, assignment, datetime.utcnow())
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}/operations", status_code=303)
 
 
 @router.post("/aircraft/{aircraft_id}/passengers/{assignment_id}/cancel")
@@ -419,7 +469,7 @@ def cancel_aircraft_passenger(
         if queued.status == PassengerAssignmentStatus.QUEUED and queued.queue_position > removed_position:
             queued.queue_position -= 1
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}/operations", status_code=303)
 
 
 @router.post("/events/{event_id}/simulate-observation")
@@ -460,4 +510,4 @@ def simulate_observation(
         ),
     )
     db.commit()
-    return RedirectResponse(url=f"/admin/events/{event_id}", status_code=303)
+    return RedirectResponse(url=f"/admin/events/{event_id}/diagnostics", status_code=303)

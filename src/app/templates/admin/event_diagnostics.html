@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "admin/_event_header.html" %}
+<section class="two-up">
+  <article class="card admin-panel">
+    <h2>Simulation</h2>
+    <p>Use this page for diagnostics and simulated observations without affecting setup workflows.</p>
+    <form method="post" action="/admin/events/{{ event.id }}/simulate-observation" class="stack-form">
+      <label>Tail number <input name="tail_number" required></label>
+      <label>Latitude <input name="latitude" type="number" step="0.000001" required></label>
+      <label>Longitude <input name="longitude" type="number" step="0.000001" required></label>
+      <label><input name="is_airborne" type="checkbox" value="true"> Airborne</label>
+      <label>Altitude ft <input name="altitude_ft" type="number"></label>
+      <label>Ground speed kt <input name="ground_speed_kt" type="number"></label>
+      <label>Heading deg <input name="heading_deg" type="number"></label>
+      <button class="button subtle" type="submit">Submit simulated observation</button>
+    </form>
+  </article>
+  <article class="card admin-panel">
+    <h2>Diagnostic Notes</h2>
+    <div class="table-list">
+      <div class="table-row"><span>Use a tracked tail number for simulation.</span></div>
+      <div class="table-row"><span>Auto transitions to `Flying` and `Arrived` still apply here.</span></div>
+      <div class="table-row"><span>Dispatcher workflows live on the `Live Aircraft` tab.</span></div>
+      <div class="table-row"><span>Aircraft setup and event open/close live on `Event Configuration`.</span></div>
+    </div>
+  </article>
+</section>
+{% endblock %}

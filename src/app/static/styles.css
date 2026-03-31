@@ -88,6 +88,25 @@ h1, h2, h3, p { margin-top: 0; }
 .error { color: #a12626; }
 .dev-note code { font-size: .95rem; }
 .table-list { display: grid; gap: .65rem; }
+.tab-strip {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem;
+}
+.tab-link {
+  text-decoration: none;
+  padding: .75rem 1rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--line);
+  font-weight: 700;
+}
+.tab-link.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
 .table-row {
   display: flex;
   justify-content: space-between;

@@ -57,11 +57,18 @@
   <h2>Events</h2>
   <div class="table-list">
     {% for event in events %}
-    <a class="table-row link-row" href="/admin/events/{{ event.id }}">
-      <strong>{{ event.name }}</strong>
-      <span>{{ event.aircraft|length }} aircraft</span>
-      <span>{{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</span>
-    </a>
+    <div class="table-row">
+      <div>
+        <strong>{{ event.name }}</strong>
+        <span>{{ event.aircraft|length }} aircraft</span>
+        <span>{{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</span>
+      </div>
+      <div class="row-actions">
+        <a class="button subtle" href="/admin/events/{{ event.id }}/operations">Live Aircraft</a>
+        <a class="button subtle" href="/admin/events/{{ event.id }}/configuration">Configure</a>
+        <a class="button subtle" href="/admin/events/{{ event.id }}/diagnostics">Diagnostics</a>
+      </div>
+    </div>
     {% else %}
     <div class="table-row"><span>No events yet.</span></div>
     {% endfor %}
