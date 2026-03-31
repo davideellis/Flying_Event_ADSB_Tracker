@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">Public Events</p>
+    <h1>Choose an event to watch aircraft rides in progress.</h1>
+    <p>Published events can be opened from this list or by direct shareable URL.</p>
+  </div>
+</section>
+<section class="card-grid">
+  {% for event in events %}
+  <article class="card">
+    <h2>{{ event.name }}</h2>
+    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }}</p>
+    <p>Tracked radius: {{ event.event_radius_nm }} NM</p>
+    <a class="button" href="/public/events/{{ event.slug }}">Open event</a>
+  </article>
+  {% else %}
+  <article class="card empty-state">
+    <h2>No published events yet</h2>
+    <p>Admins can publish events from the dashboard once they are ready.</p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Event View</p>
+    <h1>{{ event.name }}</h1>
+    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }} · States are public, passenger names stay private.</p>
+  </div>
+  <div class="event-stats">
+    <span>Airport center: {{ event.latitude }}, {{ event.longitude }}</span>
+    <span>Radius: {{ event.event_radius_nm }} NM</span>
+  </div>
+</section>
+<section class="map-layout">
+  <div class="map-card">
+    <div class="map-controls">
+      <label><input type="checkbox" id="show-all-aircraft"> Show all aircraft in area</label>
+    </div>
+    <div id="map" class="map-panel"></div>
+  </div>
+  <aside class="sidebar">
+    <h2>Tracked Aircraft</h2>
+    {% for aircraft in event.aircraft %}
+    <article class="aircraft-row">
+      <strong>{{ aircraft.tail_number }}</strong>
+      <span>{{ aircraft.effective_state.value }}</span>
+      <small>Last seen: {{ aircraft.last_seen_at or 'Not yet observed' }}</small>
+    </article>
+    {% else %}
+    <p>No aircraft configured.</p>
+    {% endfor %}
+  </aside>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script>
+  window.eventSlug = {{ event.slug|tojson }};
+  window.eventCenter = { lat: {{ event.map_center_latitude }}, lon: {{ event.map_center_longitude }}, zoom: {{ event.default_zoom }} };
+</script>
+<script src="/static/map.js"></script>
+{% endblock %}
