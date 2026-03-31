@@ -6,19 +6,19 @@
     <h2>Event Configuration</h2>
     <p>Use this page to set up the event, open or close it, and manage tracked aircraft.</p>
     <form method="post" action="/admin/events/{{ event.id }}/update" class="stack-form">
-      <label>Name <input name="name" value="{{ event.name }}" required></label>
-      <label>URL Name <input name="slug" value="{{ event.slug }}" required></label>
-      <label>Description <input name="description" value="{{ event.description or '' }}"></label>
-      <label>Airport identifier <input name="airport_code" value="{{ event.airport_code or '' }}" placeholder="KADS or ADS"></label>
-      <label>Airport name <input name="airport_name" value="{{ event.airport_name or '' }}"></label>
-      <label>Latitude <input name="latitude" type="number" step="0.000001" value="{{ event.latitude }}" placeholder="Leave blank to look up from identifier"></label>
-      <label>Longitude <input name="longitude" type="number" step="0.000001" value="{{ event.longitude }}" placeholder="Leave blank to look up from identifier"></label>
-      <label>Map center latitude <input name="map_center_latitude" type="number" step="0.000001" value="{{ event.map_center_latitude }}" placeholder="Defaults to airport latitude"></label>
-      <label>Map center longitude <input name="map_center_longitude" type="number" step="0.000001" value="{{ event.map_center_longitude }}" placeholder="Defaults to airport longitude"></label>
-      <label>Default zoom <input name="default_zoom" type="number" value="{{ event.default_zoom }}" required></label>
-      <label>Event radius NM <input name="event_radius_nm" type="number" step="0.1" value="{{ event.event_radius_nm }}" required></label>
-      <label>Return radius NM <input name="return_radius_nm" type="number" step="0.1" value="{{ event.return_radius_nm }}" required></label>
-      <label>Arrival hold seconds <input name="arrival_hold_seconds" type="number" value="{{ event.arrival_hold_seconds }}" required></label>
+      <label>Event name <input name="name" value="{{ event.name }}" placeholder="Name shown to admins and public viewers" required></label>
+      <label>URL Name <input name="slug" value="{{ event.slug }}" placeholder="Short URL path like young-eagles-april" required></label>
+      <label>Description <input name="description" value="{{ event.description or '' }}" placeholder="Optional short summary for this event"></label>
+      <label>Airport identifier <input name="airport_code" value="{{ event.airport_code or '' }}" placeholder="ICAO/IATA/FAA code like KADS or ADS"></label>
+      <label>Airport name <input name="airport_name" value="{{ event.airport_name or '' }}" placeholder="Friendly airport name shown in the app"></label>
+      <label>Latitude <input name="latitude" type="number" step="0.000001" value="{{ event.latitude }}" placeholder="Airport latitude, or leave blank to look it up"></label>
+      <label>Longitude <input name="longitude" type="number" step="0.000001" value="{{ event.longitude }}" placeholder="Airport longitude, or leave blank to look it up"></label>
+      <label>Map center latitude <input name="map_center_latitude" type="number" step="0.000001" value="{{ event.map_center_latitude }}" placeholder="Map starting center latitude"></label>
+      <label>Map center longitude <input name="map_center_longitude" type="number" step="0.000001" value="{{ event.map_center_longitude }}" placeholder="Map starting center longitude"></label>
+      <label>Default zoom <input name="default_zoom" type="number" value="{{ event.default_zoom }}" placeholder="Initial map zoom level, usually 10 to 12" required></label>
+      <label>Event radius NM <input name="event_radius_nm" type="number" step="0.1" value="{{ event.event_radius_nm }}" placeholder="How far out to watch for tracked aircraft" required></label>
+      <label>Return radius NM <input name="return_radius_nm" type="number" step="0.1" value="{{ event.return_radius_nm }}" placeholder="Radius around the airport that counts as back home" required></label>
+      <label>Arrival hold seconds <input name="arrival_hold_seconds" type="number" value="{{ event.arrival_hold_seconds }}" placeholder="Seconds inside return radius before auto-arrived" required></label>
       <label><input name="is_published" type="checkbox" value="true" {% if event.is_published %}checked{% endif %}> Published</label>
       <label><input name="is_active" type="checkbox" value="true" {% if event.is_active %}checked{% endif %}> Active</label>
       <label><input name="show_passenger_name_public" type="checkbox" value="true" {% if event.show_passenger_name_public %}checked{% endif %}> Show passenger name publicly</label>
