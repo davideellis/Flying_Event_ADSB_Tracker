@@ -11,6 +11,7 @@
     <a class="button subtle" href="/admin/users">User Admin</a>
   </div>
 </section>
+{% include "admin/_admin_nav.html" %}
 <section class="card admin-panel">
   <form method="post" action="/admin/events" class="stack-form">
     <label>Name <input name="name" placeholder="Public event title" required></label>

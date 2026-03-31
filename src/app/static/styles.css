@@ -135,6 +135,9 @@ h1, h2, h3, p { margin-top: 0; }
   flex-wrap: wrap;
   margin: 0 0 1rem;
 }
+.admin-top-nav {
+  margin-bottom: 1.25rem;
+}
 .tab-link {
   text-decoration: none;
   padding: .75rem 1rem;

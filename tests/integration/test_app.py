@@ -124,6 +124,9 @@ def test_admin_default_page_is_events_and_support_pages_exist(client, seeded_adm
     assert "Events" in events_page.text
     assert "Create Event" in create_event_page.text
     assert "User Admin" in user_admin_page.text
+    assert 'href="/admin"' in create_event_page.text
+    assert 'href="/admin/events/new"' in user_admin_page.text
+    assert 'href="/admin/users"' in events_page.text
 
 
 def test_admin_can_create_event_from_airport_identifier(client, session, seeded_admin):
@@ -237,6 +240,9 @@ def test_event_admin_pages_are_split_by_workflow(client, seeded_admin, seeded_ev
     assert "Live Aircraft Management" in operations.text
     assert "Event Configuration" in configuration.text
     assert "Simulation" in diagnostics.text
+    assert 'href="/admin"' in operations.text
+    assert 'href="/admin/events/new"' in configuration.text
+    assert 'href="/admin/users"' in diagnostics.text
 
 
 def test_admin_can_update_tracked_aircraft_from_configuration_page(client, session, seeded_admin, seeded_event):

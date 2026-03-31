@@ -9,6 +9,7 @@
     <a class="button subtle" href="/public/events/{{ event.slug }}">Public event view</a>
   </div>
 </section>
+{% include "admin/_admin_nav.html" %}
 <nav class="tab-strip">
   <a class="tab-link {% if active_tab == 'operations' %}active{% endif %}" href="{{ operations_url }}">Live Aircraft</a>
   <a class="tab-link {% if active_tab == 'configuration' %}active{% endif %}" href="{{ configuration_url }}">Event Configuration</a>

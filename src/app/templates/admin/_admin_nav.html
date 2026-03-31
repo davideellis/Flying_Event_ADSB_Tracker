@@ -1,0 +1,6 @@
+{% set current_path = request.url.path %}
+<nav class="tab-strip admin-top-nav">
+  <a class="tab-link {% if current_path == '/admin' %}active{% endif %}" href="/admin">Events</a>
+  <a class="tab-link {% if current_path == '/admin/events/new' %}active{% endif %}" href="/admin/events/new">Create Event</a>
+  <a class="tab-link {% if current_path == '/admin/users' %}active{% endif %}" href="/admin/users">User Admin</a>
+</nav>
