@@ -1,10 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ title or 'Flying Event ADS-B Tracker' }}</title>
   <link rel="stylesheet" href="/static/styles.css">
+  <script>
+    (() => {
+      const savedTheme = window.localStorage.getItem('feat-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -15,10 +23,32 @@
     <nav>
       <a href="/public/events">Events</a>
       <a href="/admin">Admin</a>
+      <button class="button subtle theme-toggle" id="theme-toggle" type="button">Dark mode</button>
     </nav>
   </header>
   <main class="page-shell">
     {% block content %}{% endblock %}
   </main>
+  <script>
+    (() => {
+      const button = document.getElementById('theme-toggle');
+      if (!button) return;
+
+      const updateButton = () => {
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        button.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+      };
+
+      button.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        window.localStorage.setItem('feat-theme', next);
+        updateButton();
+      });
+
+      updateButton();
+    })();
+  </script>
 </body>
 </html>

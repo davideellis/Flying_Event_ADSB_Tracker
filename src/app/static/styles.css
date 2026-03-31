@@ -8,6 +8,35 @@
   --line: #d8d0c4;
   --shadow: 0 14px 40px rgba(24, 33, 38, 0.08);
   --radius: 20px;
+  --page-bg: radial-gradient(circle at top left, #fff8e6, transparent 30%), linear-gradient(180deg, #efe9db, #f8f4eb 45%, #f3efe5);
+  --hero-bg: linear-gradient(135deg, rgba(15,122,91,.14), rgba(209,127,33,.13));
+  --hero-border: rgba(15,122,91,.15);
+  --subtle-button-bg: #ffffff;
+  --input-bg: #ffffff;
+  --tab-bg: rgba(255,255,255,0.72);
+  --row-bg: #faf7f0;
+  --table-head-bg: #f3eee3;
+  --label-bg: rgba(24, 33, 38, 0.82);
+}
+
+html[data-theme="dark"] {
+  --bg: #13181b;
+  --paper: #1b2227;
+  --ink: #eef3f6;
+  --muted: #a7b4bc;
+  --accent: #2cb087;
+  --accent-2: #e09539;
+  --line: #344149;
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+  --page-bg: radial-gradient(circle at top left, rgba(44,176,135,.16), transparent 26%), linear-gradient(180deg, #101517, #171d21 48%, #12171b);
+  --hero-bg: linear-gradient(135deg, rgba(44,176,135,.16), rgba(224,149,57,.14));
+  --hero-border: rgba(44,176,135,.22);
+  --subtle-button-bg: #20292e;
+  --input-bg: #141a1e;
+  --tab-bg: rgba(32,41,46,0.92);
+  --row-bg: #20282d;
+  --table-head-bg: #222b30;
+  --label-bg: rgba(238, 243, 246, 0.14);
 }
 
 * { box-sizing: border-box; }
@@ -15,7 +44,7 @@ body {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   color: var(--ink);
-  background: radial-gradient(circle at top left, #fff8e6, transparent 30%), linear-gradient(180deg, #efe9db, #f8f4eb 45%, #f3efe5);
+  background: var(--page-bg);
 }
 
 a { color: inherit; }
@@ -36,8 +65,8 @@ a { color: inherit; }
 .site-header nav a { text-decoration: none; font-weight: 600; }
 .page-shell { padding: 0 2rem 3rem; }
 .hero {
-  background: linear-gradient(135deg, rgba(15,122,91,.14), rgba(209,127,33,.13));
-  border: 1px solid rgba(15,122,91,.15);
+  background: var(--hero-bg);
+  border: 1px solid var(--hero-border);
   padding: 2rem;
   border-radius: var(--radius);
   display: flex;
@@ -75,15 +104,17 @@ h1, h2, h3, p { margin-top: 0; }
   display: inline-block;
   cursor: pointer;
 }
-.button.subtle { background: white; color: var(--ink); border: 1px solid var(--line); }
+.button.subtle { background: var(--subtle-button-bg); color: var(--ink); border: 1px solid var(--line); }
 .stack-form { display: grid; gap: .85rem; }
 .stack-form label { display: grid; gap: .35rem; font-weight: 600; }
 .stack-form input, .stack-form select {
   padding: .75rem .85rem;
   border-radius: 12px;
   border: 1px solid var(--line);
-  background: white;
+  background: var(--input-bg);
+  color: var(--ink);
 }
+.stack-form input::placeholder { color: var(--muted); opacity: .9; }
 .auth-card { max-width: 460px; margin: 3rem auto; }
 .error { color: #a12626; }
 .dev-note code { font-size: .95rem; }
@@ -98,7 +129,7 @@ h1, h2, h3, p { margin-top: 0; }
   text-decoration: none;
   padding: .75rem 1rem;
   border-radius: 999px;
-  background: rgba(255,255,255,0.72);
+  background: var(--tab-bg);
   border: 1px solid var(--line);
   font-weight: 700;
 }
@@ -114,7 +145,7 @@ h1, h2, h3, p { margin-top: 0; }
   align-items: center;
   padding: .9rem 1rem;
   border-radius: 14px;
-  background: #faf7f0;
+  background: var(--row-bg);
 }
 .link-row { text-decoration: none; }
 .map-layout {
@@ -164,13 +195,13 @@ h1, h2, h3, p { margin-top: 0; }
   white-space: nowrap;
 }
 .aircraft-board th {
-  background: #f3eee3;
+  background: var(--table-head-bg);
   position: sticky;
   top: 0;
   z-index: 1;
 }
 .aircraft-board tbody tr:nth-child(even) {
-  background: #faf7f0;
+  background: var(--row-bg);
 }
 .aircraft-div-icon {
   background: transparent;
@@ -222,7 +253,7 @@ h1, h2, h3, p { margin-top: 0; }
   stroke-width: 1.4;
 }
 .aircraft-label {
-  background: rgba(24, 33, 38, 0.82);
+  background: var(--label-bg);
   border: 0;
   border-radius: 999px;
   color: #fff;
@@ -244,6 +275,9 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .airport-label {
   background: rgba(201, 59, 50, 0.92);
+}
+.theme-toggle {
+  min-width: 7.5rem;
 }
 .sidebar, .aircraft-row { display: grid; gap: .35rem; }
 .aircraft-admin-card { margin-bottom: 1rem; }
