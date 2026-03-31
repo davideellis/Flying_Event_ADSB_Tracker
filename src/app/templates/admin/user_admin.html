@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>User Admin</h1>
+    <p>Create admin users, remove access, and reset passwords here without cluttering the events workspace.</p>
+  </div>
+  <div class="row-actions">
+    <a class="button subtle" href="/admin">Back to Events</a>
+    <a class="button subtle" href="/admin/events/new">Create Event</a>
+  </div>
+</section>
+<section class="card admin-panel">
+  <div class="two-up">
+    <article>
+      <h2>Add Admin User</h2>
+      <form method="post" action="/admin/users" class="stack-form">
+        <label>Display name <input name="display_name" required></label>
+        <label>Email <input name="email" type="email" required></label>
+        <label>Password <input name="password" type="password" required></label>
+        <button class="button" type="submit">Create admin</button>
+      </form>
+    </article>
+    <article>
+      <h2>Existing Admin Users</h2>
+      <div class="table-list">
+        {% for member in users %}
+        <div class="user-admin-card">
+          <div class="table-row">
+            <div>
+              <strong>{{ member.display_name }}</strong>
+              <span>{{ member.email }}</span>
+            </div>
+            {% if member.id != user.id %}
+            <form method="post" action="/admin/users/{{ member.id }}/delete">
+              <button class="button subtle" type="submit">Remove</button>
+            </form>
+            {% endif %}
+          </div>
+          <form method="post" action="/admin/users/{{ member.id }}/password" class="stack-form inline-form">
+            <label>Set password for {{ member.display_name }}
+              <input name="password" type="password" required>
+            </label>
+            <button class="button subtle" type="submit">Update password</button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+</section>
+{% endblock %}

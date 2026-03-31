@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Create Event</h1>
+    <p>Set up a new event here, then continue into that event's configuration and live operations pages.</p>
+  </div>
+  <div class="row-actions">
+    <a class="button subtle" href="/admin">Back to Events</a>
+    <a class="button subtle" href="/admin/users">User Admin</a>
+  </div>
+</section>
+<section class="card admin-panel">
+  <form method="post" action="/admin/events" class="stack-form">
+    <label>Name <input name="name" placeholder="Public event title" required></label>
+    <label>Short Name <input name="slug" placeholder="Short URL path like young-eagles-april" required></label>
+    <label>Description <input name="description" placeholder="Optional short summary for this event"></label>
+    <label>Airport identifier <input name="airport_code" placeholder="ICAO/IATA/FAA code like KADS or ADS"></label>
+    <label>Airport name <input name="airport_name" placeholder="Friendly airport name shown in the app"></label>
+    <label>Latitude <input name="latitude" type="number" step="0.000001" placeholder="Airport latitude, or leave blank to look it up"></label>
+    <label>Longitude <input name="longitude" type="number" step="0.000001" placeholder="Airport longitude, or leave blank to look it up"></label>
+    <label>Event radius NM <input name="event_radius_nm" type="number" step="0.1" placeholder="How far out to watch for tracked aircraft" required></label>
+    <label>Return radius NM <input name="return_radius_nm" type="number" step="0.1" placeholder="Radius around the airport that counts as back home" required></label>
+    <label>Arrival hold seconds <input name="arrival_hold_seconds" type="number" placeholder="Seconds inside return radius before auto-arrived" required></label>
+    <label>Default zoom <input name="default_zoom" type="number" value="11" placeholder="Initial map zoom level, usually 10 to 12" required></label>
+    <label><input name="is_published" type="checkbox" value="true"> Published</label>
+    <label><input name="is_active" type="checkbox" value="true"> Active</label>
+    <label><input name="show_passenger_name_public" type="checkbox" value="true"> Show passenger name publicly</label>
+    <button class="button" type="submit">Create event</button>
+  </form>
+</section>
+{% endblock %}

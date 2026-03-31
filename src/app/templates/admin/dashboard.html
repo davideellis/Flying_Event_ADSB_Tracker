@@ -4,9 +4,13 @@
   <div>
     <p class="eyebrow">Admin</p>
     <h1>Welcome, {{ user.display_name }}</h1>
-    <p>Manage events, aircraft, passengers, live simulation, and admin accounts from one place.</p>
+    <p>Events are the default workspace. Jump to event creation or user administration when you need setup tasks.</p>
   </div>
-  <form method="post" action="/auth/logout"><button class="button subtle" type="submit">Log out</button></form>
+  <div class="row-actions">
+    <a class="button subtle" href="/admin/events/new">Create Event</a>
+    <a class="button subtle" href="/admin/users">User Admin</a>
+    <form method="post" action="/auth/logout"><button class="button subtle" type="submit">Log out</button></form>
+  </div>
 </section>
 <section class="card admin-panel">
   <h2>Events</h2>
@@ -27,68 +31,6 @@
     {% else %}
     <div class="table-row"><span>No events yet.</span></div>
     {% endfor %}
-  </div>
-</section>
-<section class="two-up">
-  <article class="card admin-panel">
-    <h2>Create Event</h2>
-    <form method="post" action="/admin/events" class="stack-form">
-      <label>Name <input name="name" required></label>
-      <label>Short Name <input name="slug" required></label>
-      <label>Description <input name="description"></label>
-      <label>Airport identifier <input name="airport_code" placeholder="KADS or ADS"></label>
-      <label>Airport name <input name="airport_name"></label>
-      <label>Latitude <input name="latitude" type="number" step="0.000001" placeholder="Optional if airport identifier is provided"></label>
-      <label>Longitude <input name="longitude" type="number" step="0.000001" placeholder="Optional if airport identifier is provided"></label>
-      <label>Event radius NM <input name="event_radius_nm" type="number" step="0.1" required></label>
-      <label>Return radius NM <input name="return_radius_nm" type="number" step="0.1" required></label>
-      <label>Arrival hold seconds <input name="arrival_hold_seconds" type="number" required></label>
-      <label>Default zoom <input name="default_zoom" type="number" value="11" required></label>
-      <label><input name="is_published" type="checkbox" value="true"> Published</label>
-      <label><input name="is_active" type="checkbox" value="true"> Active</label>
-      <label><input name="show_passenger_name_public" type="checkbox" value="true"> Show passenger name publicly</label>
-      <button class="button" type="submit">Create event</button>
-    </form>
-  </article>
-</section>
-<section class="card admin-panel">
-  <h2>User Admin</h2>
-  <div class="two-up">
-    <article>
-      <h3>Add Admin User</h3>
-      <form method="post" action="/admin/users" class="stack-form">
-        <label>Display name <input name="display_name" required></label>
-        <label>Email <input name="email" type="email" required></label>
-        <label>Password <input name="password" type="password" required></label>
-        <button class="button" type="submit">Create admin</button>
-      </form>
-    </article>
-    <article>
-      <h3>Existing Admin Users</h3>
-      <div class="table-list">
-        {% for member in users %}
-        <div class="user-admin-card">
-          <div class="table-row">
-            <div>
-              <strong>{{ member.display_name }}</strong>
-              <span>{{ member.email }}</span>
-            </div>
-            {% if member.id != user.id %}
-            <form method="post" action="/admin/users/{{ member.id }}/delete">
-              <button class="button subtle" type="submit">Remove</button>
-            </form>
-            {% endif %}
-          </div>
-          <form method="post" action="/admin/users/{{ member.id }}/password" class="stack-form inline-form">
-            <label>Set password for {{ member.display_name }}
-              <input name="password" type="password" required>
-            </label>
-            <button class="button subtle" type="submit">Update password</button>
-          </form>
-        </div>
-        {% endfor %}
-      </div>
-    </article>
   </div>
 </section>
 {% endblock %}

@@ -111,6 +111,21 @@ def test_admin_can_create_event_after_login(client, session, seeded_admin):
     assert any(event.slug == "challenge-air-demo" for event in session.query(Event).all())
 
 
+def test_admin_default_page_is_events_and_support_pages_exist(client, seeded_admin, seeded_event):
+    login(client)
+
+    events_page = client.get("/admin")
+    create_event_page = client.get("/admin/events/new")
+    user_admin_page = client.get("/admin/users")
+
+    assert events_page.status_code == 200
+    assert create_event_page.status_code == 200
+    assert user_admin_page.status_code == 200
+    assert "Events" in events_page.text
+    assert "Create Event" in create_event_page.text
+    assert "User Admin" in user_admin_page.text
+
+
 def test_admin_can_create_event_from_airport_identifier(client, session, seeded_admin):
     login_response = login(client)
     assert login_response.status_code == 303

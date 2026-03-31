@@ -112,11 +112,29 @@ def _resolve_event_location(
 @router.get("", response_class=HTMLResponse)
 def dashboard(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     events = db.scalars(_event_query().order_by(Event.created_at.desc())).all()
-    users = db.scalars(select(User).order_by(User.email)).all()
     return templates.TemplateResponse(
         request,
         "admin/dashboard.html",
-        {"user": user, "events": events, "users": users, "error": None},
+        {"user": user, "events": events, "error": None},
+    )
+
+
+@router.get("/events/new", response_class=HTMLResponse)
+def create_event_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse(
+        request,
+        "admin/create_event.html",
+        {"user": user},
+    )
+
+
+@router.get("/users", response_class=HTMLResponse)
+def user_admin_page(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    users = db.scalars(select(User).order_by(User.email)).all()
+    return templates.TemplateResponse(
+        request,
+        "admin/user_admin.html",
+        {"user": user, "users": users},
     )
 
 
@@ -130,7 +148,7 @@ def create_admin_user(
 ):
     create_user(db, email=email, password=password, display_name=display_name)
     db.commit()
-    return RedirectResponse(url="/admin", status_code=303)
+    return RedirectResponse(url="/admin/users", status_code=303)
 
 
 @router.post("/users/{user_id}/delete")
@@ -149,7 +167,7 @@ def delete_admin_user(
         raise HTTPException(status_code=404)
     db.delete(user)
     db.commit()
-    return RedirectResponse(url="/admin", status_code=303)
+    return RedirectResponse(url="/admin/users", status_code=303)
 
 
 @router.post("/users/{user_id}/password")
@@ -164,7 +182,7 @@ def change_admin_user_password(
         raise HTTPException(status_code=404)
     update_user_password(user, password)
     db.commit()
-    return RedirectResponse(url="/admin", status_code=303)
+    return RedirectResponse(url="/admin/users", status_code=303)
 
 
 @router.post("/events")
