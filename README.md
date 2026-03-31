@@ -50,6 +50,7 @@ This stack keeps deployment simple on one VM while still giving us a clean path 
 - Create, edit, and delete events
 - Create and update events from an airport identifier with automatic airport coordinate lookup
 - Configure whether current passenger names are shown on the public event page
+- Add, edit, and remove tracked aircraft from event configuration
 - Add and delete tracked aircraft
 - Manually set aircraft state
 - Queue, activate, and cancel passengers

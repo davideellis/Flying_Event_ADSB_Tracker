@@ -35,20 +35,41 @@
       <label>Display name <input name="display_name"></label>
       <button class="button" type="submit">Add aircraft</button>
     </form>
-    <div class="table-list">
+    <div class="aircraft-setup-table-wrap">
+      <table class="aircraft-board aircraft-config-table">
+        <thead>
+          <tr>
+            <th>Tail</th>
+            <th>Display Name</th>
+            <th>Save</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
       {% for aircraft in event.aircraft %}
-      <div class="table-row">
-        <div>
-          <strong>{{ aircraft.tail_number }}</strong>
-          <span>{{ aircraft.display_name or 'No display name' }}</span>
-        </div>
-        <form method="post" action="/admin/aircraft/{{ aircraft.id }}/delete">
-          <button class="button subtle danger" type="submit">Remove</button>
-        </form>
-      </div>
+          <tr>
+            <td>
+              <input form="aircraft-update-{{ aircraft.id }}" name="tail_number" value="{{ aircraft.tail_number }}" required>
+            </td>
+            <td>
+              <input form="aircraft-update-{{ aircraft.id }}" name="display_name" value="{{ aircraft.display_name or '' }}">
+            </td>
+            <td>
+              <form id="aircraft-update-{{ aircraft.id }}" method="post" action="/admin/aircraft/{{ aircraft.id }}/update" class="aircraft-config-row-form">
+                <button class="button subtle" type="submit">Save</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="/admin/aircraft/{{ aircraft.id }}/delete">
+                <button class="button subtle danger" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
       {% else %}
-      <div class="table-row"><span>No aircraft configured yet.</span></div>
+          <tr><td colspan="4">No aircraft configured yet.</td></tr>
       {% endfor %}
+        </tbody>
+      </table>
     </div>
   </article>
 </section>

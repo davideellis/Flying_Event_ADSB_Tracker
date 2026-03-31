@@ -376,6 +376,23 @@ def add_aircraft(
     return RedirectResponse(url=f"/admin/events/{event_id}/configuration", status_code=303)
 
 
+@router.post("/aircraft/{aircraft_id}/update")
+def update_aircraft(
+    aircraft_id: str,
+    tail_number: str = Form(...),
+    display_name: str = Form(""),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    aircraft = db.get(EventAircraft, aircraft_id)
+    if not aircraft:
+        raise HTTPException(status_code=404)
+    aircraft.tail_number = tail_number.upper()
+    aircraft.display_name = display_name or None
+    db.commit()
+    return RedirectResponse(url=f"/admin/events/{aircraft.event_id}/configuration", status_code=303)
+
+
 @router.post("/aircraft/{aircraft_id}/delete")
 def delete_aircraft(
     aircraft_id: str,

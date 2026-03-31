@@ -224,6 +224,22 @@ def test_event_admin_pages_are_split_by_workflow(client, seeded_admin, seeded_ev
     assert "Simulation" in diagnostics.text
 
 
+def test_admin_can_update_tracked_aircraft_from_configuration_page(client, session, seeded_admin, seeded_event):
+    aircraft = session.scalar(select(EventAircraft).where(EventAircraft.event_id == seeded_event.id))
+    login(client)
+
+    response = client.post(
+        f"/admin/aircraft/{aircraft.id}/update",
+        data={"tail_number": "N777DX", "display_name": "Dispatcher One"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    session.refresh(aircraft)
+    assert aircraft.tail_number == "N777DX"
+    assert aircraft.display_name == "Dispatcher One"
+
+
 def test_admin_can_queue_and_activate_passenger(client, session, seeded_admin, seeded_event):
     aircraft = session.scalar(select(EventAircraft).where(EventAircraft.event_id == seeded_event.id))
     login(client)
