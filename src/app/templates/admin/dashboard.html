@@ -8,6 +8,27 @@
   </div>
   <form method="post" action="/auth/logout"><button class="button subtle" type="submit">Log out</button></form>
 </section>
+<section class="card admin-panel">
+  <h2>Events</h2>
+  <div class="table-list">
+    {% for event in events %}
+    <div class="table-row">
+      <div>
+        <strong>{{ event.name }}</strong>
+        <span>{{ event.aircraft|length }} aircraft</span>
+        <span>{{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</span>
+      </div>
+      <div class="row-actions">
+        <a class="button subtle" href="/admin/events/{{ event.id }}/operations">Live Aircraft</a>
+        <a class="button subtle" href="/admin/events/{{ event.id }}/configuration">Configure</a>
+        <a class="button subtle" href="/admin/events/{{ event.id }}/diagnostics">Diagnostics</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="table-row"><span>No events yet.</span></div>
+    {% endfor %}
+  </div>
+</section>
 <section class="two-up">
   <article class="card admin-panel">
     <h2>Create Event</h2>
@@ -28,50 +49,45 @@
       <button class="button" type="submit">Create event</button>
     </form>
   </article>
-  <article class="card admin-panel">
-    <h2>Add Admin User</h2>
-    <form method="post" action="/admin/users" class="stack-form">
-      <label>Display name <input name="display_name" required></label>
-      <label>Email <input name="email" type="email" required></label>
-      <label>Password <input name="password" type="password" required></label>
-      <button class="button" type="submit">Create admin</button>
-    </form>
-    <div class="table-list">
-      {% for member in users %}
-      <div class="table-row">
-        <div>
-          <strong>{{ member.display_name }}</strong>
-          <span>{{ member.email }}</span>
-        </div>
-        {% if member.id != user.id %}
-        <form method="post" action="/admin/users/{{ member.id }}/delete">
-          <button class="button subtle" type="submit">Remove</button>
-        </form>
-        {% endif %}
-      </div>
-      {% endfor %}
-    </div>
-  </article>
 </section>
 <section class="card admin-panel">
-  <h2>Events</h2>
-  <div class="table-list">
-    {% for event in events %}
-    <div class="table-row">
-      <div>
-        <strong>{{ event.name }}</strong>
-        <span>{{ event.aircraft|length }} aircraft</span>
-        <span>{{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</span>
+  <h2>User Admin</h2>
+  <div class="two-up">
+    <article>
+      <h3>Add Admin User</h3>
+      <form method="post" action="/admin/users" class="stack-form">
+        <label>Display name <input name="display_name" required></label>
+        <label>Email <input name="email" type="email" required></label>
+        <label>Password <input name="password" type="password" required></label>
+        <button class="button" type="submit">Create admin</button>
+      </form>
+    </article>
+    <article>
+      <h3>Existing Admin Users</h3>
+      <div class="table-list">
+        {% for member in users %}
+        <div class="user-admin-card">
+          <div class="table-row">
+            <div>
+              <strong>{{ member.display_name }}</strong>
+              <span>{{ member.email }}</span>
+            </div>
+            {% if member.id != user.id %}
+            <form method="post" action="/admin/users/{{ member.id }}/delete">
+              <button class="button subtle" type="submit">Remove</button>
+            </form>
+            {% endif %}
+          </div>
+          <form method="post" action="/admin/users/{{ member.id }}/password" class="stack-form inline-form">
+            <label>Set password for {{ member.display_name }}
+              <input name="password" type="password" required>
+            </label>
+            <button class="button subtle" type="submit">Update password</button>
+          </form>
+        </div>
+        {% endfor %}
       </div>
-      <div class="row-actions">
-        <a class="button subtle" href="/admin/events/{{ event.id }}/operations">Live Aircraft</a>
-        <a class="button subtle" href="/admin/events/{{ event.id }}/configuration">Configure</a>
-        <a class="button subtle" href="/admin/events/{{ event.id }}/diagnostics">Diagnostics</a>
-      </div>
-    </div>
-    {% else %}
-    <div class="table-row"><span>No events yet.</span></div>
-    {% endfor %}
+    </article>
   </div>
 </section>
 {% endblock %}

@@ -20,7 +20,7 @@ from app.models import (
 )
 from app.services.adsb import Observation
 from app.services.airports import lookup_airport
-from app.services.auth import create_user
+from app.services.auth import create_user, update_user_password
 from app.services.domain import (
     QueueLimitExceededError,
     activate_passenger,
@@ -148,6 +148,21 @@ def delete_admin_user(
     if not user:
         raise HTTPException(status_code=404)
     db.delete(user)
+    db.commit()
+    return RedirectResponse(url="/admin", status_code=303)
+
+
+@router.post("/users/{user_id}/password")
+def change_admin_user_password(
+    user_id: str,
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404)
+    update_user_password(user, password)
     db.commit()
     return RedirectResponse(url="/admin", status_code=303)
 

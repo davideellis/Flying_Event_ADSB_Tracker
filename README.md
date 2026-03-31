@@ -45,12 +45,14 @@ This stack keeps deployment simple on one VM while still giving us a clean path 
 - Password reset token flow for local/dev use
 - Bootstrap admin user on first startup
 - Split event admin workflows for live aircraft operations, event configuration, and diagnostics
+- Admin dashboard organized with events first and a dedicated user administration section
 - Create, edit, and delete events
 - Create and update events from an airport identifier with automatic airport coordinate lookup
 - Add and delete tracked aircraft
 - Manually set aircraft state
 - Queue, activate, and cancel passengers
 - Create and remove additional admin users with basic safety checks
+- Change admin passwords directly from the admin dashboard
 - Simulate aircraft observations for testing event behavior without live traffic
 
 ### Domain automation

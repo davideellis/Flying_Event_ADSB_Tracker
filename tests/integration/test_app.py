@@ -6,6 +6,7 @@ from sqlalchemy import select
 
 from app.models import Event, EventAircraft, User
 from app.services.adsb import Observation
+from app.services.auth import verify_password
 
 
 def login(client, email="admin@example.com", password="Password123!"):
@@ -247,3 +248,25 @@ def test_admin_can_delete_other_admin_but_not_self(client, session, seeded_admin
         follow_redirects=False,
     )
     assert delete_self.status_code == 400
+
+
+def test_admin_can_change_admin_password(client, session, seeded_admin):
+    other_user = User(
+        email="second@example.com",
+        password_hash="hash",
+        display_name="Second User",
+    )
+    session.add(other_user)
+    session.commit()
+
+    login(client)
+
+    response = client.post(
+        f"/admin/users/{other_user.id}/password",
+        data={"password": "NewSecret123!"},
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 303
+    session.refresh(other_user)
+    assert verify_password("NewSecret123!", other_user.password_hash)

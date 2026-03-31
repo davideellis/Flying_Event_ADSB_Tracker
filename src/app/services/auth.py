@@ -27,6 +27,10 @@ def create_user(db: Session, email: str, password: str, display_name: str) -> Us
     return user
 
 
+def update_user_password(user: User, password: str) -> None:
+    user.password_hash = hash_password(password)
+
+
 def authenticate_user(db: Session, email: str, password: str) -> User | None:
     user = db.scalar(select(User).where(User.email == email.lower(), User.is_active.is_(True)))
     if not user or not verify_password(password, user.password_hash):

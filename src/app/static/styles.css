@@ -203,6 +203,15 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .aircraft-row:last-child { border-bottom: none; }
 .aircraft-admin-card { margin-bottom: 1rem; }
+.user-admin-card {
+  display: grid;
+  gap: .75rem;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.user-admin-card:last-child {
+  border-bottom: none;
+}
 .aircraft-admin-header {
   display: flex;
   justify-content: space-between;
