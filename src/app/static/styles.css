@@ -61,8 +61,18 @@ a { color: inherit; }
   font-weight: 700;
 }
 .tagline { color: var(--muted); margin: 0.35rem 0 0; }
-.site-header nav { display: flex; gap: 1rem; }
-.site-header nav a { text-decoration: none; font-weight: 600; }
+.site-header nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.site-header nav a {
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+}
 .page-shell { padding: 0 2rem 3rem; }
 .hero {
   background: var(--hero-bg);
@@ -278,6 +288,9 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .theme-toggle {
   min-width: 7.5rem;
+  padding: .48rem .9rem;
+  line-height: 1.2;
+  align-self: center;
 }
 .sidebar, .aircraft-row { display: grid; gap: .35rem; }
 .aircraft-admin-card { margin-bottom: 1rem; }
