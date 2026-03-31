@@ -12,3 +12,9 @@ htmlcov/
 build/
 .mypy_cache/
 ruff_cache/
+*.egg-info/
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform/*.tfvars
+terraform/*.tfvars.json

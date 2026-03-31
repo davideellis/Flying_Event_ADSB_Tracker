@@ -4,7 +4,7 @@
   <div>
     <p class="eyebrow">Event Admin</p>
     <h1>{{ event.name }}</h1>
-    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }} · {{ 'Active' if event.is_active else 'Inactive' }} · {{ 'Published' if event.is_published else 'Hidden' }}</p>
+    <p>{{ event.airport_name or event.airport_code or 'Airport TBD' }}  -  {{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</p>
   </div>
   <a class="button subtle" href="/admin">Back to dashboard</a>
 </section>
@@ -61,7 +61,7 @@
     <div class="aircraft-admin-header">
       <div>
         <h3>{{ aircraft.tail_number }}</h3>
-        <p>{{ aircraft.display_name or 'No display name' }} · Effective state: {{ aircraft.effective_state.value }}</p>
+        <p>{{ aircraft.display_name or 'No display name' }}  -  Effective state: {{ aircraft.effective_state.value }}</p>
       </div>
       <div class="stack-actions">
         <small>Last seen: {{ aircraft.last_seen_at or 'Not yet observed' }}</small>
@@ -93,7 +93,7 @@
       <div class="table-row">
         <div>
           <strong>{{ assignment.passenger_name }}</strong>
-          <span>{{ assignment.status.value }} · position {{ assignment.queue_position }}</span>
+          <span>{{ assignment.status.value }}  -  position {{ assignment.queue_position }}</span>
         </div>
         <div class="row-actions">
           {% if assignment.status.value != 'current' and assignment.status.value != 'cancelled' %}

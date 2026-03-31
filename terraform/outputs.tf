@@ -8,6 +8,11 @@ output "instance_public_ip" {
   description = "Public IP attached to the Lightsail instance."
 }
 
+output "application_url" {
+  value       = local.public_url
+  description = "Primary application URL based on the configured domain or static IP."
+}
+
 output "ssh_key_name" {
   value       = try(aws_lightsail_key_pair.this[0].name, null)
   description = "Registered Lightsail key pair name when a public key path is provided."

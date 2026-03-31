@@ -1,0 +1,75 @@
+#!/bin/sh
+set -eu
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y ca-certificates git nginx python3 python3-pip python3-venv
+
+mkdir -p /opt/feat
+if [ ! -d /opt/feat/.git ]; then
+  git clone --depth 1 --branch ${repo_branch} ${repo_url} /opt/feat
+else
+  cd /opt/feat
+  git fetch origin ${repo_branch}
+  git checkout ${repo_branch}
+  git reset --hard origin/${repo_branch}
+fi
+
+cd /opt/feat
+python3 -m venv .venv
+. .venv/bin/activate
+pip install --upgrade pip
+pip install .
+mkdir -p /opt/feat/data
+
+cat > /opt/feat/.env <<EOF
+FEAT_SECRET_KEY=${app_secret_key}
+FEAT_DATABASE_URL=sqlite:////opt/feat/data/feat.db
+FEAT_PASSWORD_RESET_BASE_URL=${public_url}
+FEAT_BOOTSTRAP_ADMIN_EMAIL=${bootstrap_admin_email}
+FEAT_BOOTSTRAP_ADMIN_PASSWORD=${bootstrap_admin_password}
+FEAT_ADSB_PROVIDER=${adsb_provider}
+FEAT_ADSB_POLL_SECONDS=${adsb_poll_seconds}
+FEAT_ADSB_HTTP_BASE_URL=${adsb_http_base_url}
+FEAT_ADSB_HTTP_AREA_PATH_TEMPLATE=${adsb_http_area_path}
+FEAT_ADSB_WORKER_ENABLED=true
+EOF
+
+cat > /etc/systemd/system/feat.service <<'EOF'
+[Unit]
+Description=Flying Event ADS-B Tracker
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/feat
+EnvironmentFile=/opt/feat/.env
+ExecStart=/opt/feat/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/nginx/sites-available/feat <<'EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+
+rm -f /etc/nginx/sites-enabled/default
+ln -sf /etc/nginx/sites-available/feat /etc/nginx/sites-enabled/feat
+systemctl daemon-reload
+systemctl enable feat nginx
+systemctl restart feat nginx

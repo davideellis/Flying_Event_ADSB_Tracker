@@ -1,6 +1,7 @@
 locals {
   instance_name = var.project_name
   ssh_key_name  = "${var.project_name}-key"
+  public_url    = var.domain_name != "" ? "http://${var.domain_name}" : "http://${aws_lightsail_static_ip.app.ip_address}"
 }
 
 resource "aws_lightsail_key_pair" "this" {
@@ -16,14 +17,19 @@ resource "aws_lightsail_instance" "app" {
   bundle_id         = var.lightsail_bundle_id
   key_pair_name     = var.public_key_path != "" ? aws_lightsail_key_pair.this[0].name : null
 
-  user_data = <<-EOT
-    #!/bin/bash
-    set -euxo pipefail
-    apt-get update
-    apt-get install -y docker.io docker-compose-v2 git
-    systemctl enable docker
-    systemctl start docker
-  EOT
+  user_data = templatefile("${path.module}/templates/bootstrap.sh.tftpl", {
+    repo_url                 = var.repo_url
+    repo_branch              = var.repo_branch
+    app_secret_key           = var.app_secret_key
+    bootstrap_admin_email    = var.bootstrap_admin_email
+    bootstrap_admin_password = var.bootstrap_admin_password
+    postgres_password        = var.postgres_password
+    adsb_provider            = var.adsb_provider
+    adsb_poll_seconds        = var.adsb_poll_seconds
+    adsb_http_base_url       = var.adsb_http_base_url
+    adsb_http_area_path      = var.adsb_http_area_path_template
+    public_url               = local.public_url
+  })
 
   tags = {
     Project     = var.project_name

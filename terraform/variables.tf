@@ -39,3 +39,63 @@ variable "domain_name" {
   type        = string
   default     = ""
 }
+
+variable "repo_url" {
+  description = "Git repository URL the instance should clone during bootstrap."
+  type        = string
+  default     = "https://github.com/davideellis/Flying_Event_ADSB_Tracker.git"
+}
+
+variable "repo_branch" {
+  description = "Git branch to deploy on the Lightsail instance."
+  type        = string
+  default     = "main"
+}
+
+variable "app_secret_key" {
+  description = "Secret key used for session signing in production."
+  type        = string
+  sensitive   = true
+}
+
+variable "bootstrap_admin_email" {
+  description = "Initial admin email for production bootstrap."
+  type        = string
+  default     = "admin@example.com"
+}
+
+variable "bootstrap_admin_password" {
+  description = "Initial admin password for production bootstrap."
+  type        = string
+  sensitive   = true
+}
+
+variable "postgres_password" {
+  description = "Password for the Postgres container on the production host."
+  type        = string
+  sensitive   = true
+}
+
+variable "adsb_provider" {
+  description = "ADSB provider implementation to use in production."
+  type        = string
+  default     = "http"
+}
+
+variable "adsb_poll_seconds" {
+  description = "Polling interval for active events."
+  type        = number
+  default     = 10
+}
+
+variable "adsb_http_base_url" {
+  description = "Base URL for the HTTP ADSB provider."
+  type        = string
+  default     = "https://api.adsb.lol"
+}
+
+variable "adsb_http_area_path_template" {
+  description = "Area-query path template for the HTTP ADSB provider."
+  type        = string
+  default     = "/v2/lat/{lat}/lon/{lon}/dist/{dist}"
+}

@@ -176,7 +176,7 @@ Keep this README aligned with implementation changes. If the architecture, setup
 
 ## Remaining High-Value Work
 
-1. Wire a live ADS-B provider configuration that’s verified against the exact source you want to use in production
+1. Wire a live ADS-B provider configuration that's verified against the exact source you want to use in production
 2. Replace the in-process worker with a separately managed process or service unit for production hardening
 3. Add richer event audit trails and historical admin activity if the project grows
 4. Expand deployment automation and backup/restore runbooks for Lightsail

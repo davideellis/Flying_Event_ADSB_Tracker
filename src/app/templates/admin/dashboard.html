@@ -60,7 +60,7 @@
     <a class="table-row link-row" href="/admin/events/{{ event.id }}">
       <strong>{{ event.name }}</strong>
       <span>{{ event.aircraft|length }} aircraft</span>
-      <span>{{ 'Active' if event.is_active else 'Inactive' }} · {{ 'Published' if event.is_published else 'Hidden' }}</span>
+      <span>{{ 'Active' if event.is_active else 'Inactive' }}  -  {{ 'Published' if event.is_published else 'Hidden' }}</span>
     </a>
     {% else %}
     <div class="table-row"><span>No events yet.</span></div>

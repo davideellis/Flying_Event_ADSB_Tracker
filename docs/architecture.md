@@ -233,4 +233,4 @@ Architecture-relevant test priorities:
 - Integration tests for API behavior and ADS-B ingestion workflows
 - A small number of end-to-end smoke tests for admin login, event activation, and public live-map visibility
 
-These should protect the system’s core reliability without adding unnecessary maintenance overhead.
+These should protect the system's core reliability without adding unnecessary maintenance overhead.
