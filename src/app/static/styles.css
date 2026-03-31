@@ -127,16 +127,35 @@ h1, h2, h3, p { margin-top: 0; }
   background: transparent;
   border: 0;
 }
+.airport-div-icon {
+  background: transparent;
+  border: 0;
+}
 .aircraft-marker {
   width: 28px;
   height: 28px;
   transform-origin: center center;
   filter: drop-shadow(0 3px 6px rgba(24, 33, 38, 0.28));
 }
+.airport-marker {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 4px 8px rgba(138, 24, 24, 0.32));
+}
 .aircraft-marker svg {
   width: 100%;
   height: 100%;
   display: block;
+}
+.airport-marker svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.airport-marker path {
+  fill: #c93b32;
+  stroke: rgba(255, 245, 245, 0.98);
+  stroke-width: 1.6;
 }
 .aircraft-marker-tracked path {
   fill: var(--accent);
@@ -173,6 +192,9 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .traffic-label {
   background: rgba(77, 96, 114, 0.9);
+}
+.airport-label {
+  background: rgba(201, 59, 50, 0.92);
 }
 .sidebar, .aircraft-row { display: grid; gap: .35rem; }
 .aircraft-row {

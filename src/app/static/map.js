@@ -1,6 +1,7 @@
 let map;
 let trackedMarkers = [];
 let trafficMarkers = [];
+let airportMarkers = [];
 let polylines = [];
 const trackedTailNumbers = new Set();
 const trafficHistory = new Map();
@@ -28,6 +29,7 @@ function renderMap(payload, traffic) {
   }
 
   clearLayers();
+  renderEventAirport(payload.event);
   payload.aircraft.forEach((aircraft) => renderTrackedAircraft(aircraft));
 
   const showAll = document.getElementById('show-all-aircraft')?.checked;
@@ -42,11 +44,30 @@ function renderMap(payload, traffic) {
 function clearLayers() {
   trackedMarkers.forEach((marker) => marker.remove());
   trafficMarkers.forEach((marker) => marker.remove());
+  airportMarkers.forEach((marker) => marker.remove());
   polylines.forEach((polyline) => polyline.remove());
   trackedMarkers = [];
   trafficMarkers = [];
+  airportMarkers = [];
   polylines = [];
   trackedTailNumbers.clear();
+}
+
+function renderEventAirport(event) {
+  const marker = L.marker(
+    [event.latitude, event.longitude],
+    {
+      icon: createAirportIcon(),
+      zIndexOffset: 500,
+    }
+  ).addTo(map);
+  marker.bindPopup(`
+    <strong>Event Airport</strong><br>
+    ${event.airport_name || event.airport_code || 'Airport TBD'}<br>
+    ${event.latitude.toFixed(6)}, ${event.longitude.toFixed(6)}
+  `);
+  bindLabel(marker, event.airport_name || event.airport_code || 'Event Airport', 'airport-label', [0, -20]);
+  airportMarkers.push(marker);
 }
 
 function renderTrackedAircraft(aircraft) {
@@ -180,11 +201,28 @@ function createAircraftIcon({ heading, variant }) {
   });
 }
 
-function bindLabel(marker, text, className) {
+function createAirportIcon() {
+  const svg = `
+    <div class="airport-marker">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L19.6 11.2 L29.5 11.8 L21.8 18.1 L24.5 28 L16 22.6 L7.5 28 L10.2 18.1 L2.5 11.8 L12.4 11.2 Z"></path>
+      </svg>
+    </div>
+  `;
+
+  return L.divIcon({
+    className: 'airport-div-icon',
+    html: svg,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+}
+
+function bindLabel(marker, text, className, offset = [0, -16]) {
   marker.bindTooltip(text, {
     permanent: true,
     direction: 'top',
-    offset: [0, -16],
+    offset,
     className: `aircraft-label ${className}`,
   });
 }
