@@ -2,6 +2,12 @@
 
 A low-cost web application for managing and viewing aircraft ride events such as Young Eagles and Challenge Air. The system lets admins configure events, track specific aircraft by tail number, manage passenger assignment queues, poll ADS-B traffic for active events, and expose a public spectator map showing aircraft state and movement.
 
+This file is the human-facing overview. Agent-oriented references live in:
+
+- [AGENTS.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\AGENTS.md)
+- [ARCHITECTURE.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\ARCHITECTURE.md)
+- [DEVELOPMENT.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\DEVELOPMENT.md)
+
 ## Status
 
 The repo now includes a broader working stack:
@@ -105,6 +111,9 @@ Current production is a single Lightsail VM with `nginx`, the FastAPI app, a sep
 - `src/app/`: FastAPI app code
 - `migrations/`: Alembic migration files
 - `tests/`: Unit and integration tests
+- `AGENTS.md`: repo handoff and live-context notes for agents
+- `ARCHITECTURE.md`: system shape and runtime boundaries for agents
+- `DEVELOPMENT.md`: development workflow and testing expectations for agents
 - `docker-compose.yml`: local app + Postgres stack
 - `Dockerfile`: container image for the app
 - `docs/architecture.md`: architecture direction and hosting rationale

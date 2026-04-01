@@ -2,6 +2,16 @@
 
 This file is a practical handoff for coding agents, automation frameworks, and future contributors working in this repo.
 
+Scope of this file:
+
+- repo orientation
+- live deployment facts
+- codebase entrypoints
+- handoff context
+
+For deeper system design, use [ARCHITECTURE.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\ARCHITECTURE.md).
+For development workflow and testing expectations, use [DEVELOPMENT.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\DEVELOPMENT.md).
+
 ## Project Summary
 
 `Flying_Event_ADSB_Tracker` is a low-cost event-tracking app for volunteer aviation ride programs such as Young Eagles and Challenge Air. It provides:
@@ -112,6 +122,8 @@ Shared per-event header/tabs live in:
 
 ## Local Development Commands
 
+These are quick pointers only. The fuller development workflow lives in [DEVELOPMENT.md](c:\Users\dave\Desktop\Dev Env\Flying_Event_ADSB_Tracker\DEVELOPMENT.md).
+
 Install:
 
 ```bash
@@ -156,7 +168,7 @@ Important operational note:
 - Running restart commands through piped heredoc blocks can inject CRLF and cause `feat\\r` / `feat\\x0d` systemd errors.
 - Prefer direct one-line SSH commands for restart operations.
 - A manual Lightsail resize was performed by snapshotting the original `flying-event-adsb-tracker` instance, creating `flying-event-adsb-tracker-micro`, attaching the existing static IP, enabling swap, and deleting the original instance.
-- Terraform now has infrastructure drift relative to the live Lightsail instance name and bundle until the Terraform config is reconciled.
+- Terraform has been reconciled to the live Lightsail instance name and bundle.
 
 ## Testing Expectations
 
