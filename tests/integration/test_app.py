@@ -84,6 +84,16 @@ def test_public_event_traffic_endpoint_returns_payload(client, seeded_event, mon
     }
 
 
+def test_health_reports_worker_mode(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "ok"
+    assert payload["worker_enabled"] is True
+    assert payload["worker_mode"] == "embedded"
+
+
 def test_admin_can_create_event_after_login(client, session, seeded_admin):
     login_response = login(client)
     assert login_response.status_code == 303

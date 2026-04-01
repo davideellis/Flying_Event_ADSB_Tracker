@@ -10,6 +10,12 @@ variable "project_name" {
   default     = "flying-event-adsb-tracker"
 }
 
+variable "instance_name" {
+  description = "Actual Lightsail instance name to manage."
+  type        = string
+  default     = "flying-event-adsb-tracker-micro"
+}
+
 variable "availability_zone" {
   description = "Lightsail availability zone."
   type        = string
@@ -19,7 +25,7 @@ variable "availability_zone" {
 variable "lightsail_bundle_id" {
   description = "Lightsail instance bundle sized to keep monthly costs low."
   type        = string
-  default     = "nano_3_0"
+  default     = "micro_3_0"
 }
 
 variable "lightsail_blueprint_id" {
@@ -86,6 +92,12 @@ variable "adsb_poll_seconds" {
   description = "Polling interval for active events."
   type        = number
   default     = 10
+}
+
+variable "swap_size_gb" {
+  description = "Swapfile size to create on the Lightsail host."
+  type        = number
+  default     = 2
 }
 
 variable "adsb_http_base_url" {

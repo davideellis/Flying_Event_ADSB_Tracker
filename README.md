@@ -10,6 +10,7 @@ The repo now includes a broader working stack:
 - Core domain logic for passenger queues, track archiving, manual overrides, and automatic `Flying`/`Arrived` transitions
 - ADS-B provider abstraction with a public HTTP-compatible provider and stub provider
 - Background poller loop for active events
+- Separate worker entrypoint for production process isolation
 - Initial Alembic migration
 - Unit and integration tests covering domain, worker, provider normalization, and app flows
 - Docker and docker-compose scaffolding for local app + Postgres
@@ -22,7 +23,7 @@ The repo now includes a broader working stack:
 - Templates/UI: Jinja2 + vanilla JavaScript + Leaflet
 - Password hashing: `pbkdf2_sha256` via Passlib
 - Live traffic integration: pluggable ADS-B providers
-- Background processing: in-process async worker loop for v1
+- Background processing: dedicated ADS-B worker process in production, embedded worker for simple local development
 - Production target: PostgreSQL on a single AWS Lightsail instance
 - Local default: SQLite for quick setup, Postgres via Docker Compose when desired
 - Infra: Terraform in [`terraform/`](./terraform)
@@ -57,7 +58,7 @@ flowchart LR
     App -->|admin workflows| Admin
 ```
 
-Current production is a single Lightsail VM with `nginx`, the FastAPI app, the in-process worker, and a local SQLite database. The codebase is already structured so we can move to host-managed Postgres and a separate worker later without rewriting the app surface area.
+Current production is a single Lightsail VM with `nginx`, the FastAPI app, a separate `systemd` worker service for ADS-B polling, and a local SQLite database. The codebase is already structured so we can move to host-managed Postgres or managed AWS services later without rewriting the app surface area.
 
 ## Current Features
 
@@ -109,6 +110,7 @@ Current production is a single Lightsail VM with `nginx`, the FastAPI app, the i
 - `docs/architecture.md`: architecture direction and hosting rationale
 - `docs/database-schema.md`: data model and domain rules
 - `docs/feature-plan.md`: delivery plan and testing guidance
+- `docs/native-aws-option.md`: native AWS serverless option, tradeoffs, and cost guidance
 - `terraform/`: Terraform for AWS infrastructure
 
 ## Local Setup
@@ -204,6 +206,8 @@ Current baseline includes:
 - Public ports for SSH/HTTP/HTTPS
 - Optional SSH key registration
 - Host-native bootstrap via cloud-init style user data
+- Separate `feat` web service and `feat-worker` service
+- Configurable swapfile creation during bootstrap
 - Optional custom domain via `domain_name`
 - Automatic Let's Encrypt issuance when `domain_name` points at the Lightsail IP before bootstrap runs
 
@@ -216,6 +220,6 @@ Keep this README aligned with implementation changes. If the architecture, setup
 ## Remaining High-Value Work
 
 1. Wire a live ADS-B provider configuration that's verified against the exact source you want to use in production
-2. Replace the in-process worker with a separately managed process or service unit for production hardening
+2. Add worker supervision and health signaling around the separate background service for production hardening
 3. Add richer event audit trails and historical admin activity if the project grows
 4. Expand deployment automation and backup/restore runbooks for Lightsail

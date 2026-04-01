@@ -33,6 +33,7 @@ FEAT_ADSB_POLL_SECONDS=${adsb_poll_seconds}
 FEAT_ADSB_HTTP_BASE_URL=${adsb_http_base_url}
 FEAT_ADSB_HTTP_AREA_PATH_TEMPLATE=${adsb_http_area_path}
 FEAT_ADSB_WORKER_ENABLED=true
+FEAT_ADSB_WORKER_MODE=separate
 EOF
 
 cat > /etc/systemd/system/feat.service <<'EOF'
@@ -44,7 +45,30 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/feat
 EnvironmentFile=/opt/feat/.env
+Environment=FEAT_ADSB_WORKER_ENABLED=false
+Environment=FEAT_ADSB_WORKER_MODE=separate
 ExecStart=/opt/feat/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/feat-worker.service <<'EOF'
+[Unit]
+Description=Flying Event ADS-B Tracker Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/feat
+EnvironmentFile=/opt/feat/.env
+Environment=FEAT_ADSB_WORKER_ENABLED=true
+Environment=FEAT_ADSB_WORKER_MODE=separate
+ExecStart=/opt/feat/.venv/bin/python -m app.worker_main
 Restart=always
 RestartSec=5
 User=root
@@ -70,9 +94,18 @@ EOF
 
 rm -f /etc/nginx/sites-enabled/default
 ln -sf /etc/nginx/sites-available/feat /etc/nginx/sites-enabled/feat
+
+if ! swapon --show | grep -q /swapfile; then
+  fallocate -l ${swap_size_gb}G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=$((${swap_size_gb} * 1024))
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
 systemctl daemon-reload
-systemctl enable feat nginx
-systemctl restart feat nginx
+systemctl enable feat feat-worker nginx
+systemctl restart feat feat-worker nginx
 
 if [ -n "${domain_name}" ]; then
   certbot_args="--nginx --non-interactive --agree-tos -d ${domain_name} --redirect"

@@ -19,6 +19,7 @@ The app is intentionally optimized for cheap hosting and simple operations.
 - Host: single AWS Lightsail instance
 - Reverse proxy: `nginx`
 - App service: `systemd` unit named `feat`
+- Worker service: `systemd` unit named `feat-worker`
 - Runtime: Python virtualenv on the host
 - Current production DB: SQLite on the box
 - Public hostname: `https://adsb.massiveweb.net`
@@ -58,6 +59,8 @@ Important: the README still describes Postgres as the production target, which i
   - active-event polling logic
 - `src/app/services/worker.py`
   - recurring in-process worker loop
+- `src/app/worker_main.py`
+  - standalone worker process entrypoint for production
 - `src/app/templates/`
   - Jinja templates
 - `src/app/static/styles.css`
@@ -172,6 +175,6 @@ When changing behavior:
 ## Good Next Targets
 
 - verified live ADS-B provider tuning against the actual production source
-- split the in-process worker into its own managed service
+- keep the dedicated worker service healthy and in sync with the web process during deploys
 - improve backup/restore and snapshot runbooks
 - smooth more admin UI inconsistencies as pages evolve

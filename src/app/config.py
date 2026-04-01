@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     adsb_http_area_path_template: str = "/v2/lat/{lat}/lon/{lon}/dist/{dist}"
     adsb_http_timeout_seconds: float = 10.0
     adsb_worker_enabled: bool = True
+    adsb_worker_mode: str = "embedded"
 
 
 @lru_cache

@@ -1,5 +1,5 @@
 locals {
-  instance_name = var.project_name
+  instance_name = var.instance_name
   ssh_key_name  = "${var.project_name}-key"
   public_url    = var.domain_name != "" ? "https://${var.domain_name}" : "http://${aws_lightsail_static_ip.app.ip_address}"
 }
@@ -30,6 +30,7 @@ resource "aws_lightsail_instance" "app" {
     adsb_http_base_url       = var.adsb_http_base_url
     adsb_http_area_path      = var.adsb_http_area_path_template
     public_url               = local.public_url
+    swap_size_gb             = var.swap_size_gb
   })
 
   tags = {
@@ -48,31 +49,4 @@ resource "aws_lightsail_instance" "app" {
 
 resource "aws_lightsail_static_ip" "app" {
   name = "${var.project_name}-ip"
-}
-
-resource "aws_lightsail_static_ip_attachment" "app" {
-  static_ip_name = aws_lightsail_static_ip.app.name
-  instance_name  = aws_lightsail_instance.app.name
-}
-
-resource "aws_lightsail_instance_public_ports" "app" {
-  instance_name = aws_lightsail_instance.app.name
-
-  port_info {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-  }
-
-  port_info {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
-  }
-
-  port_info {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-  }
 }

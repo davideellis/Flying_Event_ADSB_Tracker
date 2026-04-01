@@ -58,7 +58,9 @@ async def lifespan(app: FastAPI):
     app.state.stop_event = asyncio.Event()
     app.state.worker_task = None
     app.state.adsb_provider = get_adsb_provider().name
-    if get_settings().adsb_worker_enabled:
+    settings = get_settings()
+    app.state.worker_mode = settings.adsb_worker_mode
+    if settings.adsb_worker_enabled and settings.adsb_worker_mode == "embedded":
         app.state.worker_task = asyncio.create_task(poller_loop(app.state.stop_event))
 
     yield
@@ -82,6 +84,7 @@ def create_app() -> FastAPI:
             "status": "ok",
             "adsb_provider": app.state.adsb_provider,
             "worker_enabled": get_settings().adsb_worker_enabled,
+            "worker_mode": app.state.worker_mode,
         }
 
     return app

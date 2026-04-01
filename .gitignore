@@ -18,3 +18,4 @@ ruff_cache/
 *.tfstate.*
 terraform/*.tfvars
 terraform/*.tfvars.json
+terraform/state-backup*.json
