@@ -22,6 +22,9 @@ The app is intentionally optimized for cheap hosting and simple operations.
 - Runtime: Python virtualenv on the host
 - Current production DB: SQLite on the box
 - Public hostname: `https://adsb.massiveweb.net`
+- Current Lightsail instance name: `flying-event-adsb-tracker-micro`
+- Current Lightsail bundle: `micro_3_0`
+- Current memory/swap profile: `1 GB RAM` with a `2 GB` swapfile enabled
 
 Important: the README still describes Postgres as the production target, which is the architectural direction, but the live deployed environment is currently using SQLite for simplicity and cost.
 
@@ -65,6 +68,8 @@ Important: the README still describes Postgres as the production target, which i
   - app workflow tests
 - `tests/unit/`
   - domain/provider/worker tests
+- `docs/native-aws-option.md`
+  - native AWS serverless recommendation and cost/tradeoff write-up
 
 ## Current Admin Information Architecture
 
@@ -146,6 +151,8 @@ Important operational note:
 
 - Running restart commands through piped heredoc blocks can inject CRLF and cause `feat\\r` / `feat\\x0d` systemd errors.
 - Prefer direct one-line SSH commands for restart operations.
+- A manual Lightsail resize was performed by snapshotting the original `flying-event-adsb-tracker` instance, creating `flying-event-adsb-tracker-micro`, attaching the existing static IP, enabling swap, and deleting the original instance.
+- Terraform now has infrastructure drift relative to the live Lightsail instance name and bundle until the Terraform config is reconciled.
 
 ## Testing Expectations
 
@@ -159,6 +166,7 @@ When changing behavior:
 ## Documentation Expectations
 
 - Keep `README.md` current when architecture, setup flow, or major user-visible behavior changes
+- Keep `AGENTS.md` current when deployment reality, workflow notes, or repo handoff context changes
 - Keep Terraform isolated under `terraform/`
 
 ## Good Next Targets
