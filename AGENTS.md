@@ -26,6 +26,7 @@ The app is intentionally optimized for cheap hosting and simple operations.
 - Current Lightsail instance name: `flying-event-adsb-tracker-micro`
 - Current Lightsail bundle: `micro_3_0`
 - Current memory/swap profile: `1 GB RAM` with a `2 GB` swapfile enabled
+- Production process env is expected to be split between `.env.web` and `.env.worker`
 
 Important: the README still describes Postgres as the production target, which is the architectural direction, but the live deployed environment is currently using SQLite for simplicity and cost.
 

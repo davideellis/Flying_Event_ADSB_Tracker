@@ -207,6 +207,7 @@ Current baseline includes:
 - Optional SSH key registration
 - Host-native bootstrap via cloud-init style user data
 - Separate `feat` web service and `feat-worker` service
+- Separate web and worker env files for clearer process ownership
 - Configurable swapfile creation during bootstrap
 - Optional custom domain via `domain_name`
 - Automatic Let's Encrypt issuance when `domain_name` points at the Lightsail IP before bootstrap runs
