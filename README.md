@@ -37,25 +37,25 @@ flowchart LR
     Spectator[Public Spectator Browser]
     Admin[Admin Browser]
     Nginx[nginx on Lightsail]
-    App[FastAPI App<br/>Jinja + JSON APIs]
-    Worker[Background Poller]
+    Web[feat web service<br/>FastAPI + Jinja + JSON APIs]
+    Worker[feat-worker service<br/>ADSB Poller]
     Provider[ADSB Provider Adapter]
     PublicSource[Public / Community ADS-B Source]
-    DB[(SQLite now<br/>Postgres target)]
+    DB[(SQLite on Lightsail<br/>Postgres later if needed)]
     Map[Leaflet + OpenStreetMap]
 
     Spectator -->|HTTPS| Nginx
     Admin -->|HTTPS| Nginx
-    Nginx --> App
+    Nginx --> Web
 
-    App --> DB
+    Web --> DB
     Worker --> DB
     Worker --> Provider
     Provider --> PublicSource
 
-    App -->|event JSON + traffic JSON| Map
+    Web -->|event JSON + traffic JSON| Map
     Map --> Spectator
-    App -->|admin workflows| Admin
+    Web -->|admin workflows| Admin
 ```
 
 Current production is a single Lightsail VM with `nginx`, the FastAPI app, a separate `systemd` worker service for ADS-B polling, and a local SQLite database. The codebase is already structured so we can move to host-managed Postgres or managed AWS services later without rewriting the app surface area.

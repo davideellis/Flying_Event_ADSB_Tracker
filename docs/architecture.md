@@ -12,11 +12,10 @@ The first version of this application should prioritize:
 ## Recommended Hosting Model
 
 The recommended v1 deployment is a single AWS Lightsail instance running:
-- Web frontend
-- Backend API
-- Background ADS-B polling worker
-- PostgreSQL database
 - Reverse proxy and TLS termination
+- Web app service
+- Background ADS-B polling worker service
+- SQLite database on the host for current production
 
 This trades away high availability in favor of cost and simplicity, which matches the project goals.
 
@@ -54,7 +53,7 @@ Suggested behavior:
 - Poll backend every 10 seconds for live event updates
 - Render current passenger track separately from archived tracks
 
-### 2. Backend API
+### 2. Web App / Backend API
 
 Responsibilities:
 - Authentication and session management
@@ -95,7 +94,9 @@ Automation rules:
 
 ### 4. Database
 
-Use PostgreSQL on the same Lightsail instance for v1.
+Current production uses SQLite on the same Lightsail instance.
+
+PostgreSQL remains a reasonable future upgrade when operational simplicity matters less than relational durability and backup options.
 
 Responsibilities:
 - Store users, events, aircraft, tail numbers, passenger queues, tracks, and position samples
@@ -103,10 +104,15 @@ Responsibilities:
 - Store event configuration such as radii and hold times
 - Support published vs active event visibility rules
 
-Why PostgreSQL:
-- Good fit for relational admin/event data
-- Good enough for modest volumes of track samples in v1
-- Easier to query archived data than a pure document model
+Why SQLite currently works:
+- Extremely simple operationally for a volunteer-run service
+- Good enough for current scale on a single host
+- Keeps hosting cost and moving parts low
+
+Why PostgreSQL is still on the roadmap:
+- Better concurrent write behavior as the app grows
+- Better backup/restore and inspection workflows
+- Easier path if the app is split across multiple processes or hosts
 
 ### 5. Reverse Proxy / Web Server
 
@@ -133,11 +139,11 @@ Keep Terraform under `terraform/` and manage at minimum:
 
 Single host processes:
 - Reverse proxy
-- Application server
-- Background worker
-- PostgreSQL
+- `feat` web app service
+- `feat-worker` background worker service
+- SQLite database file on disk
 
-Use systemd or containers on the host to keep services manageable.
+Use `systemd` on the host to keep services manageable.
 
 ## Security Model
 
@@ -221,9 +227,10 @@ For the first cut, a simple single root module is acceptable, as long as it stay
 ## Operational Guidance
 
 Recommended v1 operations:
-- Nightly PostgreSQL backup or Lightsail snapshot
+- Lightsail snapshots or database file backups
 - Basic health check endpoint
-- Log aggregation to local files or system journal initially
+- Separate supervision for web and worker services
+- Log aggregation to the system journal initially
 - Manual recovery runbook documented in repo later
 
 ## Testing Priorities
